@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1" maximum-scale=1.0,
+          user-scalable=no"/>
+
+</head>
+
+<body>
+<script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const url = urlParams.get('url');
+        const fileName = urlParams.get('fileName');
+        const token = urlParams.get('token');
+        const final_result = url+'%2F'+fileName+'&'+token;
+
+        window.onload = (event) => {
+            var x = document.getElementById("imageUrl");
+            x.style.backgroundSize = "cover";
+            x.src = final_result;
+
+        };
+</script>
+<!--<center>-->
+    <img style="border-radius: 5px; background-size: cover;" id="imageUrl" width="359px" height="180px">
+<!--</center>-->
+
+</body>
+
+</html>

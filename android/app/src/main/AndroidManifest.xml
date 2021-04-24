@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.art_restraunts">
+    package="com.example.share_market">
    <application
-        android:label="art_restraunts"
+        android:label="share_market"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
