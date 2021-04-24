@@ -7,7 +7,7 @@ import 'package:share_market/services/meetings_services.dart';
 
 class EnterMinutesOfMeetingCard extends StatefulWidget {
   final DocumentSnapshot cardData;
-  final int pageWidth;
+  final double pageWidth;
   final String userRole;
 
   EnterMinutesOfMeetingCard({@required this.cardData,@required this.pageWidth,@required this.userRole});
@@ -18,7 +18,7 @@ class EnterMinutesOfMeetingCard extends StatefulWidget {
 
 class _EnterMinutesOfMeetingCardState extends State<EnterMinutesOfMeetingCard> {
   final DocumentSnapshot cardData;
-  final int pageWidth;
+  final double pageWidth;
   final String userRole;
 
   _EnterMinutesOfMeetingCardState({@required this.cardData,@required this.pageWidth,@required this.userRole});

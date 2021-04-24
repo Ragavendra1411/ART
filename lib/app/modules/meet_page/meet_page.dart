@@ -626,7 +626,7 @@ class _MeetPageState extends State<MeetPage> {
     //     physics: NeverScrollableScrollPhysics(),
     //     shrinkWrap: true,
     //     itemCount: meetings.length,
-    //     itemBuilder: (BuildContext context, int index) {
+    //     itemBuilder: (BuildContext context, double index) {
     //       return meetingCard(meetings[index]);
     //     });
     //
@@ -841,7 +841,7 @@ class _MeetPageState extends State<MeetPage> {
   }
 
   showMeetingDetailsPopUp(BuildContext context, DocumentSnapshot data,
-      int width, String userRole) async {
+      double width, String userRole) async {
     await showDialog(
         barrierDismissible: false,
         context: context,
@@ -852,7 +852,7 @@ class _MeetPageState extends State<MeetPage> {
   }
 
   showEnterMinutesOfMeetingCard(BuildContext context, DocumentSnapshot data,
-      int width, String userRole) async {
+      double width, String userRole) async {
     await showDialog(
         barrierDismissible: false,
         context: context,

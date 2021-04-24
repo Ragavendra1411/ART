@@ -11,7 +11,7 @@ class ExpandableText extends StatefulWidget {
   final String text;
   final int trimLines;
   final DocumentSnapshot cardData;
-  final int pageWidth;
+  final double pageWidth;
   final String userRole;
   @override
   ExpandableTextState createState() => ExpandableTextState();
@@ -22,7 +22,7 @@ class ExpandableTextState extends State<ExpandableText> {
     showMeetingDetailsPopUp(context,widget.cardData,widget.pageWidth,widget.userRole.toString());
   }
 
-  showMeetingDetailsPopUp(BuildContext context,DocumentSnapshot data,int width,String userRole) async{
+  showMeetingDetailsPopUp(BuildContext context,DocumentSnapshot data,double width,String userRole) async{
     await showDialog(
         barrierDismissible: false,
         context: context,

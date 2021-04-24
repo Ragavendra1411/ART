@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'constants.dart';
 
 class Utilities{
-  void toastMessage(String message, Color colour, IconData icon,int width,BuildContext context) {
+  void toastMessage(String message, Color colour, IconData icon,double width,BuildContext context) {
     final snackBar = SnackBar(
         width: width > 400 ? 500 : width,
         content: Row(

@@ -9,7 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class ViewMeetDetailsCard extends StatefulWidget {
   final DocumentSnapshot cardData;
-  final int pageWidth;
+  final double pageWidth;
   final String userRole;
 
   ViewMeetDetailsCard({@required this.cardData,@required this.pageWidth,@required this.userRole});
@@ -20,12 +20,12 @@ class ViewMeetDetailsCard extends StatefulWidget {
 
 class _ViewMeetDetailsCardState extends State<ViewMeetDetailsCard> {
   final DocumentSnapshot cardData;
-  final int pageWidth;
+  final double pageWidth;
   final String userRole;
 
   _ViewMeetDetailsCardState({@required this.cardData,@required this.pageWidth,@required this.userRole});
 
-  showEnterMinutesOfMeetingCard(BuildContext context,DocumentSnapshot data,int width,String userRole) async{
+  showEnterMinutesOfMeetingCard(BuildContext context,DocumentSnapshot data,double width,String userRole) async{
     await showDialog(
         barrierDismissible: false,
         context: context,
