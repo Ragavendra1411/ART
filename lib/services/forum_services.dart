@@ -19,6 +19,7 @@ class ForumServices {
       });
     }
     else{
+      data['createdAt'] = DateTime.now();
       await userRef.add(data).then((value) {
         responseMap["isSuccess"] = true;
       }).onError((error, stackTrace) {
