@@ -3,9 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_market/app/models/user.dart';
+import 'package:share_market/app/modules/documents/document_folders.dart';
 import 'package:share_market/app/modules/documents/documents.dart';
 import 'package:share_market/app/modules/meet_page/meet_page.dart';
 import 'package:share_market/app/modules/users_page/users_page.dart';
+import 'package:share_market/app/modules/video_folders/video_folder.dart';
 import 'package:share_market/app/modules/videos/videos.dart';
 import 'package:share_market/app/services/firebase_authentication_service.dart';
 import 'package:share_market/app_commons/constants.dart';
@@ -222,8 +224,8 @@ class _HomePageState extends State<HomePage>
                 controller: controller,
                 children: [
                   MeetPage(dataSend: userDatas),
-                  VideosPage(dataSend: userDatas),
-                  DocumentsPage(dataSend: userDatas),
+                  VideoFoldersPage(dataSend: userDatas),
+                  DocumentFoldersPage(dataSend: userDatas),
                   UsersPage(dataSend: userDatas),
                 ],
               ))
@@ -232,8 +234,8 @@ class _HomePageState extends State<HomePage>
                 controller: controller,
                 children: [
                   MeetPage(dataSend: userDatas),
-                  VideosPage(dataSend: userDatas),
-                  DocumentsPage(dataSend: userDatas),
+                  VideoFoldersPage(dataSend: userDatas),
+                  DocumentFoldersPage(dataSend: userDatas),
                 ],
               ))
       ],
