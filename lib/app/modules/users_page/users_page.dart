@@ -183,7 +183,7 @@ class _UsersPageState extends State<UsersPage> {
                                 onPressed:
                                 isSavingUser ? null : saveUser,
                                 child: !isSavingUser
-                                    ? Text("Save Meeting",
+                                    ? Text("Save User",
                                     style: TextStyle(
                                         color: SM_BACKGROUND_WHITE,
                                         fontSize: 16.0))

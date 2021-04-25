@@ -114,6 +114,7 @@ class FirebaseAuthService {
     FirebaseAuth.instance
         .createUserWithEmailAndPassword(email: email, password: password)
         .then((signedInUser) => {
+          
               Firestore.instance
                   .collection('users')
                   .document(signedInUser.user.uid)
