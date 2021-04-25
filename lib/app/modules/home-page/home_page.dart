@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_market/app/models/user.dart';
 import 'package:share_market/app/modules/documents/documents.dart';
+import 'package:share_market/app/modules/forums/forums_page.dart';
 import 'package:share_market/app/modules/meet_page/meet_page.dart';
 import 'package:share_market/app/modules/users_page/users_page.dart';
 import 'package:share_market/app/modules/videos/videos.dart';
@@ -54,7 +55,7 @@ class _HomePageState extends State<HomePage>
 
       userDatas = value.data;
       controller = new TabController(
-          length: userDatas["role"] == "admin" ? 4 : 3, vsync: this);
+          length: userDatas["role"] == "admin" ? 5 : 4, vsync: this);
     });
     return userDatas;
   }
@@ -171,6 +172,19 @@ class _HomePageState extends State<HomePage>
                           ),
                         ),
                       ),
+
+
+                      new Tab(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 15.0, right: 15.0),
+                        child: Container(
+                          child: Text(
+                            "Forums",
+                            style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                          ),
+                        ),
+                      ),
+                    )
                     ])
               : TabBar(
                   indicatorPadding: EdgeInsets.symmetric(horizontal: 10),
@@ -214,6 +228,18 @@ class _HomePageState extends State<HomePage>
                           ),
                         ),
                       ),
+
+                    new Tab(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 15.0, right: 15.0),
+                        child: Container(
+                          child: Text(
+                            "Forums",
+                            style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                          ),
+                        ),
+                      ),
+                    ),
                     ]),
         ),
         userDatas["role"] == "admin"
@@ -225,6 +251,7 @@ class _HomePageState extends State<HomePage>
                   VideosPage(dataSend: userDatas),
                   DocumentsPage(dataSend: userDatas),
                   UsersPage(dataSend: userDatas),
+                  ForumsMainPage(dataSend: userDatas),
                 ],
               ))
             : Flexible(
@@ -234,6 +261,7 @@ class _HomePageState extends State<HomePage>
                   MeetPage(dataSend: userDatas),
                   VideosPage(dataSend: userDatas),
                   DocumentsPage(dataSend: userDatas),
+                  ForumsMainPage(dataSend: userDatas),
                 ],
               ))
       ],
