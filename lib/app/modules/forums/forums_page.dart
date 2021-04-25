@@ -418,7 +418,8 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
               formData['description'] = forumDescController.text.trim();
               formData["isDeleted"] = false;
               _setState(true);
-              await ForumServices().addEditForums(formData,dataEdit.documentID,edit).then((value) {
+              var docId = edit ? dataEdit.documentID : '';
+              await ForumServices().addEditForums(formData,docId,edit).then((value) {
                 if (value["isSuccess"]) {
                   setState(() {
                     isSavingMeating = false;
