@@ -77,13 +77,14 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
         stream: Firestore.instance
             .collection("forums")
             .where("isDeleted", isEqualTo: false)
-            .orderBy('createdAt')
+            .orderBy('createdAt',descending: true)
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: Text('Loading'));
           }
           if (snapshot.hasError) {
+            print("ERROR IS ${snapshot.error}");
             return Center(child: Text('Error'));
           }
           if (snapshot.connectionState == ConnectionState.done) {
@@ -169,10 +170,8 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                                   // setState(() {
                                   //   isSavingMeating = false;y
                                   // });
-                                  toastMessage(
-                                      "Deleted the forum successfully",
-                                      cursorColour,
-                                      Icons.done);
+                                  toastMessage("Deleted the forum successfully",
+                                      cursorColour, Icons.done);
                                 } else {
                                   // setState(() {
                                   //   isSavingMeating = false;
@@ -255,29 +254,38 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                             "Description:",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(height: 10,),
-
-                          ExpandableTextForum(data['description'].toString().trim(),
-                              data, width, dataSend["role"].toString()),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          ExpandableTextForum(
+                              data['description'].toString().trim(),
+                              data,
+                              width,
+                              dataSend["role"].toString()),
                         ],
                       )
                     : Container(),
-                SizedBox(height: 10,),
-                InkWell(child: Row(
-                  children: [
-                    Text('Click here to view the article',style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.blue
-                    ),),
-                  ],
-                ),onTap: () async{
-                  var uri = data["forumLink"];
-                  if (await canLaunch(uri)) {
-                    await launch(uri);
-                  } else {
-                    throw 'Could not launch $uri';
-                  }
-                },)
+                SizedBox(
+                  height: 10,
+                ),
+                InkWell(
+                  child: Row(
+                    children: [
+                      Text(
+                        'Click here to view the article',
+                        style: TextStyle(fontSize: 20, color: Colors.blue),
+                      ),
+                    ],
+                  ),
+                  onTap: () async {
+                    var uri = data["forumLink"];
+                    if (await canLaunch(uri)) {
+                      await launch(uri);
+                    } else {
+                      throw 'Could not launch $uri';
+                    }
+                  },
+                )
               ],
             ),
           ],
@@ -419,14 +427,18 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
               formData["isDeleted"] = false;
               _setState(true);
               var docId = edit ? dataEdit.documentID : '';
-              await ForumServices().addEditForums(formData,docId,edit).then((value) {
+              await ForumServices()
+                  .addEditForums(formData, docId, edit)
+                  .then((value) {
                 if (value["isSuccess"]) {
                   setState(() {
                     isSavingMeating = false;
                   });
                   Navigator.pop(context);
                   toastMessage(
-                      "${edit ? 'Updated' : 'Added'} the forum successfully", cursorColour, Icons.done);
+                      "${edit ? 'Updated' : 'Added'} the forum successfully",
+                      cursorColour,
+                      Icons.done);
                 } else {
                   _setState(false);
                   toastMessage("Oops! Something went wrong. Please try again.",
@@ -684,7 +696,8 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                                   onPressed:
                                       isImageLoading ? null : saveMeeting,
                                   child: !isSavingMeating
-                                      ? Text("${edit ? 'Update':'Save'} Forum",
+                                      ? Text(
+                                          "${edit ? 'Update' : 'Save'} Forum",
                                           style: TextStyle(
                                               color: SM_BACKGROUND_WHITE,
                                               fontSize: 16.0))

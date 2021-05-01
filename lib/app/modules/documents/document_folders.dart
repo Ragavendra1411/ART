@@ -308,7 +308,7 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
   }
 
   Widget folderCard(DocumentSnapshot data) {
-    return InkWell(
+    return GestureDetector(
       onTap: width < 400
           ? () {
               print("FOLDER OPENED");
