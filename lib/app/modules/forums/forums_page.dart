@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase/firebase.dart' as fb;
 import 'package:flutter/material.dart';
 import 'package:share_market/app/modules/forums/expandable_desc.dart';
+import 'package:share_market/app/modules/forums/view_forum.dart';
 import 'package:share_market/app/modules/meet_page/view_more_text.dart';
 import 'package:share_market/app_commons/ahcrm_text_field.dart';
 import 'package:share_market/app_commons/constants.dart';
@@ -111,186 +112,190 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
   }
 
   Widget forumCard(DocumentSnapshot data) {
-    return Card(
-      shadowColor: SM_ORANGE,
-      margin: EdgeInsets.all(10),
-      semanticContainer: true,
-      clipBehavior: Clip.antiAliasWithSaveLayer,
-      elevation: 5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(5.0),
-      ),
-      child: Container(
-        padding: EdgeInsets.all(12),
-        // height: 150,
-        height: 480,
-        width: width < 401 ? width : 400,
-        child: Column(
-          children: [
-            ClipRRect(
-                borderRadius: BorderRadius.circular(5),
-                child: Container(
-                  height: 200,
-                  child: data["forumImageUrl"] != null
-                      ? Image.network(
-                          data["forumImageUrl"].toString(),
-                          fit: BoxFit.cover,
-                          height: double.infinity,
-                          width: double.infinity,
-                        )
-                      : Image.asset("assets/images/logo.png"),
-                  color: Colors.transparent,
-                )),
-            SizedBox(height: 20),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Text(
-                  data["title"],
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    dataSend['role'] == 'admin'
-                        ? ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              primary: SM_RED,
-                              padding: EdgeInsets.all(18.0),
-                            ),
-                            onPressed: () async {
-                              await ForumServices()
-                                  .deleteForums(data.documentID)
-                                  .then((value) {
-                                if (value["isSuccess"]) {
-                                  // setState(() {
-                                  //   isSavingMeating = false;y
-                                  // });
-                                  toastMessage("Deleted the forum successfully",
-                                      cursorColour, Icons.done);
-                                } else {
-                                  // setState(() {
-                                  //   isSavingMeating = false;
-                                  // });
-                                  toastMessage(
-                                      "Oops! Something went wrong. Please try again.",
-                                      ERROR_RED,
-                                      Icons.error);
-                                }
-                              }).catchError((error) {
-                                // setState(() {
-                                //   isSavingMeating = false;
-                                // });
-                                toastMessage(
-                                    "Oops! Something went wrong. Please try again.",
-                                    ERROR_RED,
-                                    Icons.error);
-                              });
-                            },
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.delete,
-                                  color: Colors.white,
-                                ),
-                                Text(
-                                  ' Delete Forum ',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      letterSpacing: 1.5,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                            ),
-                          )
-                        : Container(),
-                    SizedBox(width: 10),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: SM_ORANGE,
-                        padding: EdgeInsets.all(18.0),
-                      ),
-                      onPressed: () async {
-                        showMessageDialog(context, true, data);
-                        // var uri = data["meetingLink"];
-                        // if (await canLaunch(uri)) {
-                        //   await launch(uri);
-                        // } else {
-                        //   throw 'Could not launch $uri';
-                        // }
-                      },
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.edit,
-                            color: Colors.white,
-                          ),
-                          Text(
-                            ' Edit Forum ',
-                            style: TextStyle(
-                                color: Colors.white,
-                                letterSpacing: 1.5,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 10),
-                data['description'] != null &&
-                        data['description'].toString().trim() != ""
-                    ? Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: 20.0,
-                          ),
-                          Text(
-                            "Description:",
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          ExpandableTextForum(
-                              data['description'].toString().trim(),
-                              data,
-                              width,
-                              dataSend["role"].toString()),
-                        ],
-                      )
-                    : Container(),
-                SizedBox(
-                  height: 10,
-                ),
-                InkWell(
-                  child: Row(
+    return InkWell(
+      child: Card(
+        shadowColor: SM_ORANGE,
+        margin: EdgeInsets.all(10),
+        semanticContainer: true,
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        elevation: 5,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        child: Container(
+          padding: EdgeInsets.all(12),
+          // height: 150,
+          height: 480,
+          width: width < 401 ? width : 400,
+          child: Column(
+            children: [
+              ClipRRect(
+                  borderRadius: BorderRadius.circular(5),
+                  child: Container(
+                    height: 200,
+                    child: data["forumImageUrl"] != null
+                        ? Image.network(
+                      data["forumImageUrl"].toString(),
+                      fit: BoxFit.cover,
+                      height: double.infinity,
+                      width: double.infinity,
+                    )
+                        : Image.asset("assets/images/logo.png"),
+                    color: Colors.transparent,
+                  )),
+              SizedBox(height: 20),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    data["title"],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Click here to view the article',
-                        style: TextStyle(fontSize: 20, color: Colors.blue),
+                      dataSend['role'] == 'admin'
+                          ? ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: SM_RED,
+                          padding: EdgeInsets.all(18.0),
+                        ),
+                        onPressed: () async {
+                          await ForumServices()
+                              .deleteForums(data.documentID)
+                              .then((value) {
+                            if (value["isSuccess"]) {
+                              // setState(() {
+                              //   isSavingMeating = false;y
+                              // });
+                              toastMessage("Deleted the forum successfully",
+                                  cursorColour, Icons.done);
+                            } else {
+                              // setState(() {
+                              //   isSavingMeating = false;
+                              // });
+                              toastMessage(
+                                  "Oops! Something went wrong. Please try again.",
+                                  ERROR_RED,
+                                  Icons.error);
+                            }
+                          }).catchError((error) {
+                            // setState(() {
+                            //   isSavingMeating = false;
+                            // });
+                            toastMessage(
+                                "Oops! Something went wrong. Please try again.",
+                                ERROR_RED,
+                                Icons.error);
+                          });
+                        },
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                            ),
+                            Text(
+                              ' Delete Forum ',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  letterSpacing: 1.5,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
+                      )
+                          : Container(),
+                      SizedBox(width: 10),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: SM_ORANGE,
+                          padding: EdgeInsets.all(18.0),
+                        ),
+                        onPressed: () async {
+                          showMessageDialog(context, true, data);
+                          // var uri = data["meetingLink"];
+                          // if (await canLaunch(uri)) {
+                          //   await launch(uri);
+                          // } else {
+                          //   throw 'Could not launch $uri';
+                          // }
+                        },
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.edit,
+                              color: Colors.white,
+                            ),
+                            Text(
+                              ' Edit Forum ',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  letterSpacing: 1.5,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                  onTap: () async {
-                    var uri = data["forumLink"];
-                    if (await canLaunch(uri)) {
-                      await launch(uri);
-                    } else {
-                      throw 'Could not launch $uri';
-                    }
-                  },
-                )
-              ],
-            ),
-          ],
+                  SizedBox(height: 10),
+                  data['description'] != null &&
+                      data['description'].toString().trim() != ""
+                      ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 20.0,
+                      ),
+                      Text(
+                        "Description:",
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      ExpandableTextForum(
+                          data['description'].toString().trim(),
+                          data,
+                          width,
+                          dataSend["role"].toString()),
+                    ],
+                  )
+                      : Container(),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  InkWell(
+                    child: Text('Click here to view the article',style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.blue
+                    ),),
+                    onTap: () async {
+                      var uri = data["forumLink"];
+                      if (await canLaunch(uri)) {
+                        await launch(uri);
+                      } else {
+                        throw 'Could not launch $uri';
+                      }
+                    },
+                  )
+                ],
+              ),
+            ],
+          ),
         ),
       ),
+      onTap: (){
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ViewForum(data: data, dataSend: dataSend)),
+        );
+      },
     );
   }
 
