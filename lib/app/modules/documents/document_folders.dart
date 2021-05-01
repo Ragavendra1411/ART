@@ -309,13 +309,19 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
 
   Widget folderCard(DocumentSnapshot data) {
     return GestureDetector(
+      onSecondaryTap: () {
+        print("Right clcik");
+      },
       onTap: width < 400
           ? () {
               print("FOLDER OPENED");
-               Navigator.push(
+              Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => DocumentsPage(dataSend: dataSend,
-                folderData: data,)),
+                MaterialPageRoute(
+                    builder: (context) => DocumentsPage(
+                          dataSend: dataSend,
+                          folderData: data,
+                        )),
               );
             }
           : null,
@@ -323,10 +329,13 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
           ? null
           : () {
               print("FOLDER OPENED");
-               Navigator.push(
+              Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => DocumentsPage(dataSend: dataSend,
-                folderData: data,)),
+                MaterialPageRoute(
+                    builder: (context) => DocumentsPage(
+                          dataSend: dataSend,
+                          folderData: data,
+                        )),
               );
             },
       child: Container(
@@ -339,7 +348,10 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
                 height: 70,
                 child: Image.asset('assets/images/folderIcon.png')),
             SizedBox(height: 10),
-            Text(data["name"],textAlign: TextAlign.center,),
+            Text(
+              data["name"],
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),
