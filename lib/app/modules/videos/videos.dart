@@ -38,6 +38,7 @@ class _VideosPageState extends State<VideosPage> {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         centerTitle: true,
         title: Text(folderData["name"]),
@@ -62,7 +63,7 @@ class _VideosPageState extends State<VideosPage> {
               backgroundColor: SM_ORANGE,
             )
           : null,
-      backgroundColor: backgroundOrangeColour,
+      // backgroundColor: backgroundOrangeColour,
       body: Scrollbar(
         child: SingleChildScrollView(
           child: Column(
@@ -698,7 +699,7 @@ class _VideosPageState extends State<VideosPage> {
                           height: 20,
                         ),
                         // Text("FolderName"),
-                        AhCrmTextField(
+                        SMTextField(
                           context: context,
                           nextFocusNode: null,
                           currentFocusNode: null,

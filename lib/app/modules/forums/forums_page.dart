@@ -2,17 +2,20 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:firebase/firebase.dart' as fb;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:share_market/app/modules/forums/expandable_desc.dart';
 import 'package:share_market/app/modules/forums/view_forum.dart';
-import 'package:share_market/app/modules/meet_page/view_more_text.dart';
-import 'package:share_market/app_commons/sm_text_field.dart';
 import 'package:share_market/app_commons/constants.dart';
+import 'package:share_market/app_commons/sm_text_field.dart';
 import 'package:share_market/services/forum_services.dart';
 import 'package:universal_html/prefer_universal/html.dart' as html;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:validators/validators.dart';
+import '../../../app_commons/constants.dart';
 
 class ForumsMainPage extends StatefulWidget {
   final Map dataSend;
@@ -39,14 +42,14 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
     super.initState();
   }
 
-  confirmDelete(BuildContext context,DocumentSnapshot data) async{
+  confirmDelete(BuildContext context, DocumentSnapshot data) async {
     bool isDeleting = false;
     await showDialog(
         barrierDismissible: false,
         context: context,
         builder: (context) {
           return StatefulBuilder(
-            builder: (context, StateSetter setState){
+            builder: (context, StateSetter setState) {
               return AlertDialog(
                 title: Text(
                   "Deleting a forum",
@@ -76,31 +79,32 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                         Navigator.of(context, rootNavigator: true).pop(context);
                       }),
                   new ElevatedButton(
-                      child: isDeleting? Center(
-                        child: SizedBox(
-                          height: 15,
-                          width: 15,
-                          child: CircularProgressIndicator(
-                            valueColor:
-                            AlwaysStoppedAnimation<
-                                Color>(SM_WHITE),
-                          ),
-                        ),
-                      ):new Text(
-                        "Delete",
-                        style: TextStyle(
-                          color: SM_WHITE,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      onPressed: () async{
-                        setState((){
+                      child: isDeleting
+                          ? Center(
+                              child: SizedBox(
+                                height: 15,
+                                width: 15,
+                                child: CircularProgressIndicator(
+                                  valueColor:
+                                      AlwaysStoppedAnimation<Color>(SM_WHITE),
+                                ),
+                              ),
+                            )
+                          : new Text(
+                              "Delete",
+                              style: TextStyle(
+                                color: SM_WHITE,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                      onPressed: () async {
+                        setState(() {
                           isDeleting = true;
                         });
                         await ForumServices()
                             .deleteForums(data.documentID)
                             .then((value) {
-                          setState((){
+                          setState(() {
                             isDeleting = true;
                           });
                           if (value["isSuccess"]) {
@@ -114,7 +118,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                                 Icons.error);
                           }
                         }).catchError((error) {
-                          setState((){
+                          setState(() {
                             isDeleting = true;
                           });
                           toastMessage(
@@ -134,6 +138,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
+    print('TIME ${DateTime.now().toLocal().toIso8601String()}');
     return Scaffold(
       floatingActionButton: dataSend['role'] == 'Admin'
           ? FloatingActionButton.extended(
@@ -143,8 +148,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
               },
               label: Text(
                 ' ADD FORUM',
-                style:
-                    TextStyle(color: SM_WHITE, fontWeight: FontWeight.bold),
+                style: TextStyle(color: SM_WHITE, fontWeight: FontWeight.bold),
               ),
               icon: Icon(
                 Icons.add,
@@ -160,16 +164,17 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
           ),
         ),
       ),
-      backgroundColor: backgroundOrangeColour,
+      backgroundColor: Colors.transparent,
     );
   }
 
   forumPageBody() {
+    final format1 = new DateFormat("yyyy-MM-dd");
     return StreamBuilder(
         stream: Firestore.instance
             .collection("forums")
-            .where("isDeleted", isEqualTo: false)
-            .orderBy('createdAt',descending: true)
+            .where("isDeleted", isEqualTo: false).where('forumDate',isEqualTo: format1.format(DateTime.now().toLocal()))
+            .orderBy('createdAt', descending: true)
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -216,27 +221,30 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
         child: Container(
           padding: EdgeInsets.all(12),
           // height: 150,
-          height: dataSend["role"] == "Admin" || dataSend["role"] == "Professional" ? 480:430,
+          height:
+              dataSend["role"] == "Admin" || dataSend["role"] == "Professional"
+                  ? 480
+                  : 430,
           width: width < 401 ? width : 400,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-             Center(
-               child:  ClipRRect(
-                   borderRadius: BorderRadius.circular(5),
-                   child: Container(
-                     height: 200,
-                     child: data["forumImageUrl"] != null
-                         ? Image.network(
-                       data["forumImageUrl"].toString(),
-                       fit: BoxFit.cover,
-                       height: double.infinity,
-                       width: double.infinity,
-                     )
-                         : Image.asset("assets/images/logo.png"),
-                     color: Colors.transparent,
-                   )),
-             ),
+              Center(
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(5),
+                    child: Container(
+                      height: 200,
+                      child: data["forumImageUrl"] != null
+                          ? Image.network(
+                              data["forumImageUrl"].toString(),
+                              fit: BoxFit.cover,
+                              height: double.infinity,
+                              width: double.infinity,
+                            )
+                          : Image.asset("assets/images/logo.png"),
+                      color: Colors.transparent,
+                    )),
+              ),
               SizedBox(height: 20),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -247,22 +255,27 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                     children: [
                       dataSend['role'] == 'Admin'
                           ? IconButton(
-                        icon: Icon(Icons.delete,color:SM_GREY,),
-                        tooltip: "Delete forum",
-                        onPressed: () {
-                          confirmDelete(context,data);
-                        },
-
-                      )
+                              icon: Icon(
+                                Icons.delete,
+                                color: SM_GREY,
+                              ),
+                              tooltip: "Delete forum",
+                              onPressed: () {
+                                confirmDelete(context, data);
+                              },
+                            )
                           : Container(),
                       SizedBox(width: 10),
-                      dataSend["role"] == "Admin" || dataSend["role"] == "Professional"?IconButton(
-                        icon: Icon(Icons.edit,color: SM_GREY),
-                        tooltip: "Edit forum",
-                        onPressed: () async {
-                          showMessageDialog(context, true, data);
-                        },
-                      ):Container(),
+                      dataSend["role"] == "Admin" ||
+                              dataSend["role"] == "Professional"
+                          ? IconButton(
+                              icon: Icon(Icons.edit, color: SM_GREY),
+                              tooltip: "Edit forum",
+                              onPressed: () async {
+                                showMessageDialog(context, true, data);
+                              },
+                            )
+                          : Container(),
                     ],
                   ),
                   Text(
@@ -273,36 +286,36 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                   ),
                   SizedBox(height: 12),
                   data['description'] != null &&
-                      data['description'].toString().trim() != ""
+                          data['description'].toString().trim() != ""
                       ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: 20.0,
-                      ),
-                      Text(
-                        "Description:",
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      ExpandableTextForum(
-                          data['description'].toString().trim(),
-                          data,
-                          width,
-                          dataSend["role"].toString()),
-                    ],
-                  )
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              height: 20.0,
+                            ),
+                            Text(
+                              "Description:",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            ExpandableTextForum(
+                                data['description'].toString().trim(),
+                                data,
+                                width,
+                                dataSend["role"].toString()),
+                          ],
+                        )
                       : Container(),
                   SizedBox(
                     height: 10,
                   ),
                   InkWell(
-                    child: Text('Click here to view the article',style: TextStyle(
-                        fontSize: 14,
-                        color: SM_BLUE
-                    ),),
+                    child: Text(
+                      'Click here to view the article',
+                      style: TextStyle(fontSize: 14, color: SM_BLUE),
+                    ),
                     onTap: () async {
                       var uri = data["forumLink"];
                       if (await canLaunch(uri)) {
@@ -318,10 +331,11 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
           ),
         ),
       ),
-      onTap: (){
+      onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ViewForum(data: data, dataSend: dataSend)),
+          MaterialPageRoute(
+              builder: (context) => ViewForum(data: data, dataSend: dataSend)),
         );
       },
     );
@@ -338,6 +352,10 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
     final TextEditingController titleController = TextEditingController();
     final TextEditingController urlLinkController = TextEditingController();
     final TextEditingController forumDescController = TextEditingController();
+    final TextEditingController dateController = TextEditingController();
+    final _fnDate = FocusNode();
+    final format = new DateFormat("yyyy-MM-dd");
+
     if (edit) {
       titleController.text = dataEdit['title'];
       urlLinkController.text = dataEdit['forumLink'];
@@ -345,6 +363,8 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
       formData['forumImageUrl'] = dataEdit['forumImageUrl'];
       imageStatus =
           dataEdit['forumImageUrl'] != null && dataEdit['forumImageUrl'] != '';
+      dateController.text = dataEdit['forumDate'];
+
     }
 
     await showDialog(
@@ -448,7 +468,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
           void saveMeeting() async {
             if (titleController.text.trim().length == 0 ||
                 urlLinkController.text.trim().length == 0 ||
-                forumDescController.text.trim().length == 0) {
+                forumDescController.text.trim().length == 0 || dateController.text.trim().length == 0 ) {
               toastMessage("Enter all the fields.", ERROR_RED, Icons.error);
             } else if (!isURL(urlLinkController.text.trim(),
                 requireTld: false)) {
@@ -545,7 +565,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                                                     Text(
                                                       "Add Image",
                                                       style: TextStyle(
-                                                          color:black54),
+                                                          color: black54),
                                                     )
                                                   ],
                                                 )),
@@ -688,6 +708,39 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                           isPaddingNeeded: false,
                           defaultTextFieldWidth: false,
                         ),
+                        DateTimeField(
+                          style: TextStyle(color: SM_BLACK),
+                          controller: dateController,
+                          focusNode: _fnDate,
+                          format: format,
+                          onChanged: (value) {
+                            formData["forumDate"] = format.format(value.toLocal());
+                          },
+                          textInputAction: TextInputAction.next,
+                          onSaved: (value) {
+                            formData["forumDate"] = format.format(value.toLocal());
+                          },
+                          decoration: const InputDecoration(
+                              suffixIcon: Icon(
+                                Icons.calendar_today,
+                                color: Colors.black54,
+                              ),
+                              labelText: 'Forum Display Date',
+                              labelStyle: TextStyle(
+                                  color: Colors.black54,
+                                  fontWeight: FontWeight.w300),
+                              enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                color: SM_ORANGE,
+                              ))),
+                          onShowPicker: (context, currentValue) {
+                            return showDatePicker(
+                                context: context,
+                                firstDate: DateTime.now(),
+                                initialDate: DateTime.now(),
+                                lastDate: DateTime(2100));
+                          },
+                        ),
                         SMTextField(
                           context: context,
                           nextFocusNode: null,
@@ -714,8 +767,8 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                                 },
                                 child: Text(
                                   "Cancel",
-                                  style: TextStyle(
-                                      color: black54, fontSize: 16.0),
+                                  style:
+                                      TextStyle(color: black54, fontSize: 16.0),
                                 )),
                             SizedBox(width: 15.0),
                             Container(

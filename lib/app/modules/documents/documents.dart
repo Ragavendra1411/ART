@@ -32,6 +32,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
   var videoName;
 
   TextEditingController titleController = TextEditingController();
+
   var width;
   _DocumentsPageState({@required this.dataSend, @required this.folderData});
   @override
@@ -62,7 +63,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
               backgroundColor: SM_ORANGE,
             )
           : null,
-      backgroundColor: backgroundOrangeColour,
+      backgroundColor: Colors.transparent,
       body: Scrollbar(
         child: SingleChildScrollView(
           child: Column(
@@ -716,7 +717,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                           height: 20,
                         ),
                         // Text("FolderName"),
-                        AhCrmTextField(
+                        SMTextField(
                           context: context,
                           nextFocusNode: null,
                           currentFocusNode: null,

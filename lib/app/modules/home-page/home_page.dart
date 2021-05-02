@@ -9,6 +9,7 @@ import 'package:share_market/app/modules/users_page/users_page.dart';
 import 'package:share_market/app/modules/video_folders/video_folder.dart';
 import 'package:share_market/app_commons/app_bar_common.dart';
 import 'package:share_market/app_commons/constants.dart';
+import 'dart:ui' as ui;
 
 class HomePage extends StatefulWidget {
   final User user;
@@ -64,7 +65,7 @@ class _HomePageState extends State<HomePage>
 
       userDatas = value.data;
       controller = new TabController(
-          length: userDatas["role"] == "admin" ? 5 : 4, vsync: this);
+          length: userDatas["role"] == "Admin" ? 5 : 4, vsync: this);
       controller.addListener(_handleTabSelection);
     });
     return userDatas;
@@ -91,7 +92,7 @@ class _HomePageState extends State<HomePage>
                       height: height,
                       width: width,
                       child: Image.asset(
-                        imagess[i],
+                        imagess[0],
                         fit: BoxFit.cover,
                       )),
                   _buildContent(context),
@@ -124,7 +125,7 @@ class _HomePageState extends State<HomePage>
                           child: Container(
                             child: Text(
                               "Meeting",
-                              style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                              style: TextStyle(fontFamily: "OpenSans-SemiBold",color: Colors.black,fontWeight: FontWeight.bold,letterSpacing: 1.0),
                             ),
                           ),
                         ),
@@ -135,7 +136,7 @@ class _HomePageState extends State<HomePage>
                           child: Container(
                             child: Text(
                               "Videos",
-                              style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                              style: TextStyle(fontFamily: "OpenSans-SemiBold",color: Colors.black,fontWeight: FontWeight.bold,letterSpacing: 1.0),
                             ),
                           ),
                         ),
@@ -146,7 +147,7 @@ class _HomePageState extends State<HomePage>
                           child: Container(
                             child: Text(
                               "Documents",
-                              style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                              style: TextStyle(fontFamily: "OpenSans-SemiBold",color: Colors.black,fontWeight: FontWeight.bold,letterSpacing: 1.0),
                             ),
                           ),
                         ),
@@ -157,7 +158,7 @@ class _HomePageState extends State<HomePage>
                           child: Container(
                             child: Text(
                               "Forums",
-                              style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                              style: TextStyle(fontFamily: "OpenSans-SemiBold",color: Colors.black,fontWeight: FontWeight.bold,letterSpacing: 1.0),
                             ),
                           ),
                         ),
@@ -168,7 +169,7 @@ class _HomePageState extends State<HomePage>
                           child: Container(
                             child: Text(
                               "Users",
-                              style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                              style: TextStyle(fontFamily: "OpenSans-SemiBold",color: Colors.black,fontWeight: FontWeight.bold,letterSpacing: 1.0),
                             ),
                           ),
                         ),
@@ -189,8 +190,9 @@ class _HomePageState extends State<HomePage>
                           child: Container(
                             child: Text(
                               "Meeting",
-                              style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                              style: TextStyle(fontFamily: "OpenSans-SemiBold",color: Colors.black,fontWeight: FontWeight.bold,letterSpacing: 1.0),
                             ),
+                            // child: textBold('Meeting'),
                           ),
                         ),
                       ),
@@ -200,7 +202,7 @@ class _HomePageState extends State<HomePage>
                           child: Container(
                             child: Text(
                               "Videos",
-                              style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                              style: TextStyle(fontFamily: "OpenSans-SemiBold",color: Colors.black,fontWeight: FontWeight.bold,letterSpacing: 1.0),
                             ),
                           ),
                         ),
@@ -211,7 +213,7 @@ class _HomePageState extends State<HomePage>
                           child: Container(
                             child: Text(
                               "Documents",
-                              style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                              style: TextStyle(fontFamily: "OpenSans-SemiBold",color: Colors.black,fontWeight: FontWeight.bold,letterSpacing: 1.0),
                             ),
                           ),
                         ),
@@ -222,7 +224,7 @@ class _HomePageState extends State<HomePage>
                           child: Container(
                             child: Text(
                               "Forums",
-                              style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                              style: TextStyle(fontFamily: "OpenSans-SemiBold",color: Colors.black,fontWeight: FontWeight.bold,letterSpacing: 1.0),
                             ),
                           ),
                         ),
@@ -313,5 +315,29 @@ class _HomePageState extends State<HomePage>
             children: [Container(), Container(), Container()],
           ))
         ]));
+  }
+
+
+  Widget textBold(String name) {
+    String data = name;
+    TextStyle style = Theme.of(context).textTheme.subtitle1.apply(color: Colors.black54,fontWeightDelta: 12);
+    return ClipRect(
+      child: new Stack(
+        children: [
+          // new Positioned(
+          //   top: 2.0,
+          //   left: 2.0,
+          //   child: new Text(
+          //     data,
+          //     style: style.copyWith(color: Colors.black.withOpacity(0.5)),
+          //   ),
+          // ),
+          new BackdropFilter(
+            filter: new ui.ImageFilter.blur(sigmaX: 2.0, sigmaY: 2.0),
+            child: new Text(data, style: style),
+          ),
+        ],
+      ),
+    );
   }
 }

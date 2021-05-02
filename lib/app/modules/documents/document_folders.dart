@@ -55,7 +55,7 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
               backgroundColor: SM_ORANGE,
             )
           : null,
-      backgroundColor: backgroundOrangeColour,
+      backgroundColor: Colors.transparent,
       body: Scrollbar(
         child: SingleChildScrollView(
           child: Column(
