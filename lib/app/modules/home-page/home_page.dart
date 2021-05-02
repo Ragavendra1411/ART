@@ -9,6 +9,7 @@ import 'package:share_market/app/modules/meet_page/meet_page.dart';
 import 'package:share_market/app/modules/users_page/users_page.dart';
 import 'package:share_market/app/modules/video_folders/video_folder.dart';
 import 'package:share_market/app/services/firebase_authentication_service.dart';
+import 'package:share_market/app_commons/app_bar_common.dart';
 import 'package:share_market/app_commons/constants.dart';
 
 class HomePage extends StatefulWidget {
@@ -23,6 +24,8 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage>
     with SingleTickerProviderStateMixin {
   final User user;
+  var height;
+  var width;
 
   _HomePageState({@required this.user});
 
@@ -30,6 +33,13 @@ class _HomePageState extends State<HomePage>
 
   bool _isLoading = true;
   var userDatas;
+  int i = 0;
+  List imagess = [
+    'assets/images/demo.jpg',
+    'assets/images/demo2.jpeg',
+    'assets/images/demo3.jpeg',
+    'assets/images/demo.jpg'
+  ];
 
   @override
   void initState() {
@@ -57,66 +67,47 @@ class _HomePageState extends State<HomePage>
       userDatas = value.data;
       controller = new TabController(
           length: userDatas["role"] == "admin" ? 5 : 4, vsync: this);
+      controller.addListener(_handleTabSelection);
     });
     return userDatas;
+  }
+  _handleTabSelection(){
+    setState(() {
+       i = controller.index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.orange[50],
-        centerTitle: true,
-        title: Image.asset(
-          'assets/images/logo_crop.png',
-          width: 50,
-          height: 50,
-        ),
-        flexibleSpace: Container(
-            margin: EdgeInsets.only(left: 10, top: 10),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                CircleAvatar(
-                    radius: 18,
-                    backgroundImage: AssetImage('assets/images/avatar.png')),
-                SizedBox(
-                  width: 5,
-                ),
-                userDatas != null
-                    ? Text('Hi ${userDatas['userName']}')
-                    : Container(),
-              ],
-            )),
-        actions: [
-          InkWell(
-            onTap: () {
-              context.read<FirebaseAuthService>().signOut();
-            },
-            child: Container(
-              margin: EdgeInsets.only(right: 10),
-              child: Row(
-                children: [
-                  Text('Logout'),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Icon(Icons.logout),
-                ],
-              ),
-            ),
+    height = MediaQuery.of(context).size.height;
+    width = MediaQuery.of(context).size.width;
+    return Stack(
+      children: [
+        Scaffold(
+
+          backgroundColor: Colors.transparent,
+          body : _isLoading ? _loadingCircle() : Stack(
+            children: [
+              Container(
+                  height: height,
+                  width: width,
+                  child: Image.asset(
+                    imagess[i],
+                    fit: BoxFit.cover,
+                  )),
+              _buildContent(context),
+              // _centerLogForm(context),
+            ],
           ),
-        ],
-      ),
-      backgroundColor: Colors.orange[50],
-      body: _isLoading ? _loadingCircle() : _buildContent(context),
+        ),
+      ],
     );
   }
 
   _buildContent(BuildContext context) {
     return Column(
       children: [
+       AppBarCommon(userDatas: userDatas),
         Container(
 //          width: MediaQuery.of(context).size.width / 4,
           child: userDatas["role"] == "admin"
@@ -174,16 +165,16 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                       new Tab(
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 15.0, right: 15.0),
-                        child: Container(
-                          child: Text(
-                            "Forums",
-                            style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 15.0, right: 15.0),
+                          child: Container(
+                            child: Text(
+                              "Forums",
+                              style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                            ),
                           ),
                         ),
                       ),
-                    ),
                     ])
               : TabBar(
                   indicatorPadding: EdgeInsets.symmetric(horizontal: 10),
@@ -228,16 +219,16 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                       new Tab(
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 15.0, right: 15.0),
-                        child: Container(
-                          child: Text(
-                            "Forums",
-                            style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 15.0, right: 15.0),
+                          child: Container(
+                            child: Text(
+                              "Forums",
+                              style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                            ),
                           ),
                         ),
                       ),
-                    ),
                     ]),
         ),
         userDatas["role"] == "admin"

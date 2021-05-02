@@ -581,7 +581,7 @@ class _MeetPageState extends State<MeetPage> {
           ),
         ),
       ),
-      backgroundColor: backgroundOrangeColour,
+      backgroundColor: Colors.transparent,
     );
   }
 
