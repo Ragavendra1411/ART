@@ -15,6 +15,7 @@ import 'package:share_market/services/forum_services.dart';
 import 'package:universal_html/prefer_universal/html.dart' as html;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:validators/validators.dart';
+
 import '../../../app_commons/constants.dart';
 
 class ForumsMainPage extends StatefulWidget {
@@ -173,7 +174,9 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
     return StreamBuilder(
         stream: Firestore.instance
             .collection("forums")
-            .where("isDeleted", isEqualTo: false).where('forumDate',isEqualTo: format1.format(DateTime.now().toLocal()))
+            .where("isDeleted", isEqualTo: false)
+            .where('forumDate',
+                isEqualTo: format1.format(DateTime.now().toLocal()))
             .orderBy('createdAt', descending: true)
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -364,7 +367,6 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
       imageStatus =
           dataEdit['forumImageUrl'] != null && dataEdit['forumImageUrl'] != '';
       dateController.text = dataEdit['forumDate'];
-
     }
 
     await showDialog(
@@ -468,7 +470,8 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
           void saveMeeting() async {
             if (titleController.text.trim().length == 0 ||
                 urlLinkController.text.trim().length == 0 ||
-                forumDescController.text.trim().length == 0 || dateController.text.trim().length == 0 ) {
+                forumDescController.text.trim().length == 0 ||
+                dateController.text.trim().length == 0) {
               toastMessage("Enter all the fields.", ERROR_RED, Icons.error);
             } else if (!isURL(urlLinkController.text.trim(),
                 requireTld: false)) {
@@ -714,11 +717,13 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                           focusNode: _fnDate,
                           format: format,
                           onChanged: (value) {
-                            formData["forumDate"] = format.format(value.toLocal());
+                            formData["forumDate"] =
+                                format.format(value.toLocal());
                           },
                           textInputAction: TextInputAction.next,
                           onSaved: (value) {
-                            formData["forumDate"] = format.format(value.toLocal());
+                            formData["forumDate"] =
+                                format.format(value.toLocal());
                           },
                           decoration: const InputDecoration(
                               suffixIcon: Icon(
