@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:share_market/app_commons/ahcrm_text_field.dart';
+import 'package:share_market/app_commons/sm_text_field.dart';
 import 'package:share_market/app_commons/constants.dart';
 import 'package:share_market/app_commons/utilities.dart';
 import 'package:share_market/services/meetings_services.dart';
@@ -102,7 +102,7 @@ class _EnterMinutesOfMeetingCardState extends State<EnterMinutesOfMeetingCard> {
                     ],
                   ),
                   SizedBox(height: 10,),
-                  AhCrmTextField(
+                  SMTextField(
                     context: context,
                     nextFocusNode: null,
                     currentFocusNode: null,

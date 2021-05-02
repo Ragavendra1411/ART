@@ -1,14 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:share_market/app/models/user.dart';
 import 'package:share_market/app/modules/documents/document_folders.dart';
 import 'package:share_market/app/modules/forums/forums_page.dart';
 import 'package:share_market/app/modules/meet_page/meet_page.dart';
 import 'package:share_market/app/modules/users_page/users_page.dart';
 import 'package:share_market/app/modules/video_folders/video_folder.dart';
-import 'package:share_market/app/services/firebase_authentication_service.dart';
 import 'package:share_market/app_commons/app_bar_common.dart';
 import 'package:share_market/app_commons/constants.dart';
 
@@ -71,9 +69,10 @@ class _HomePageState extends State<HomePage>
     });
     return userDatas;
   }
-  _handleTabSelection(){
+
+  _handleTabSelection() {
     setState(() {
-       i = controller.index;
+      i = controller.index;
     });
   }
 
@@ -81,42 +80,41 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     height = MediaQuery.of(context).size.height;
     width = MediaQuery.of(context).size.width;
-    return Stack(
-      children: [
-        Scaffold(
-
-          backgroundColor: Colors.transparent,
-          body : _isLoading ? _loadingCircle() : Stack(
-            children: [
-              Container(
-                  height: height,
-                  width: width,
-                  child: Image.asset(
-                    imagess[i],
-                    fit: BoxFit.cover,
-                  )),
-              _buildContent(context),
-              // _centerLogForm(context),
-            ],
-          ),
-        ),
-      ],
-    );
+    return Stack(children: [
+      Scaffold(
+        backgroundColor: Colors.transparent,
+        body: _isLoading
+            ? _loadingCircle()
+            : Stack(
+                children: [
+                  Container(
+                      height: height,
+                      width: width,
+                      child: Image.asset(
+                        imagess[i],
+                        fit: BoxFit.cover,
+                      )),
+                  _buildContent(context),
+                  // _centerLogForm(context),
+                ],
+              ),
+      ),
+    ]);
   }
 
   _buildContent(BuildContext context) {
     return Column(
       children: [
-       AppBarCommon(userDatas: userDatas),
+        AppBarCommon(userDatas: userDatas),
         Container(
 //          width: MediaQuery.of(context).size.width / 4,
-          child: userDatas["role"] == "admin"
+          child: userDatas["role"] == "Admin"
               ? TabBar(
                   indicatorPadding: EdgeInsets.symmetric(horizontal: 10),
                   labelPadding: EdgeInsets.symmetric(horizontal: 1),
                   isScrollable: true,
                   labelStyle: TextStyle(fontSize: 16.0),
-                  labelColor: Colors.black,
+                  labelColor: SM_BLACK,
                   indicatorColor: SM_ORANGE,
                   controller: controller,
                   tabs: <Widget>[
@@ -158,7 +156,7 @@ class _HomePageState extends State<HomePage>
                           padding: EdgeInsets.only(left: 15.0, right: 15.0),
                           child: Container(
                             child: Text(
-                              "Users",
+                              "Forums",
                               style: TextStyle(fontFamily: "OpenSans-SemiBold"),
                             ),
                           ),
@@ -169,7 +167,7 @@ class _HomePageState extends State<HomePage>
                           padding: EdgeInsets.only(left: 15.0, right: 15.0),
                           child: Container(
                             child: Text(
-                              "Forums",
+                              "Users",
                               style: TextStyle(fontFamily: "OpenSans-SemiBold"),
                             ),
                           ),
@@ -181,7 +179,7 @@ class _HomePageState extends State<HomePage>
                   labelPadding: EdgeInsets.symmetric(horizontal: 1),
                   isScrollable: true,
                   labelStyle: TextStyle(fontSize: 16.0),
-                  labelColor: Colors.black,
+                  labelColor: SM_BLACK,
                   indicatorColor: SM_ORANGE,
                   controller: controller,
                   tabs: <Widget>[
@@ -231,7 +229,7 @@ class _HomePageState extends State<HomePage>
                       ),
                     ]),
         ),
-        userDatas["role"] == "admin"
+        userDatas["role"] == "Admin"
             ? Flexible(
                 child: TabBarView(
                 controller: controller,
@@ -239,8 +237,8 @@ class _HomePageState extends State<HomePage>
                   MeetPage(dataSend: userDatas),
                   VideoFoldersPage(dataSend: userDatas),
                   DocumentFoldersPage(dataSend: userDatas),
-                  UsersPage(dataSend: userDatas),
                   ForumsMainPage(dataSend: userDatas),
+                  UsersPage(dataSend: userDatas),
                 ],
               ))
             : Flexible(
@@ -279,7 +277,7 @@ class _HomePageState extends State<HomePage>
                 labelPadding: EdgeInsets.symmetric(horizontal: 1),
                 isScrollable: false,
                 labelStyle: TextStyle(fontSize: 16.0),
-                labelColor: Colors.black,
+                labelColor: SM_BLACK,
                 indicatorColor: SM_ORANGE,
                 controller: controller,
                 tabs: <Widget>[

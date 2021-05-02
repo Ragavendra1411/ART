@@ -93,7 +93,7 @@ class _ViewMeetDetailsCardState extends State<ViewMeetDetailsCard> {
                           children: [
                             Icon(
                               Icons.calendar_today,
-                              color: Colors.grey,
+                              color: SM_GREY,
                             ),
                             SizedBox(width: 6),
                             Text(
@@ -105,7 +105,7 @@ class _ViewMeetDetailsCardState extends State<ViewMeetDetailsCard> {
                             SizedBox(width: 10),
                             Icon(
                               Icons.access_time,
-                              color: Colors.grey,
+                              color: SM_GREY,
                             ),
                             SizedBox(width: 6),
                             Text(
@@ -122,7 +122,7 @@ class _ViewMeetDetailsCardState extends State<ViewMeetDetailsCard> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            userRole == 'admin'
+                            userRole == 'Admin'
                                 ? ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 primary: SM_RED,
@@ -175,7 +175,7 @@ class _ViewMeetDetailsCardState extends State<ViewMeetDetailsCard> {
                           ],
                         ),
                         SizedBox(height: 10),
-                        userRole == 'admin'
+                        userRole == 'Admin'
                             ? ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             primary: cursorColour,
