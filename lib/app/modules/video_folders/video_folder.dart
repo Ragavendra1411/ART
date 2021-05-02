@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:share_market/app/modules/videos/videos.dart';
@@ -15,6 +17,14 @@ class VideoFoldersPage extends StatefulWidget {
 }
 
 class _VideoFoldersPageState extends State<VideoFoldersPage> {
+
+ @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    document.onContextMenu.listen((event) => event.preventDefault());
+  }
+
   final Map dataSend;
   double width;
   bool isSavingFolder = false;
@@ -30,7 +40,7 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
           ? FloatingActionButton.extended(
               heroTag: null,
               onPressed: () {
-                showMessageDialog(context);
+                showMessageDialog(context, false, null);
               },
               label: Text(
                 ' ADD FOLDER',
@@ -55,7 +65,10 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
     );
   }
 
-  showMessageDialog(BuildContext context) async {
+  showMessageDialog(
+      BuildContext context, bool isEdit, DocumentSnapshot data) async {
+    folderTitleController.text = isEdit ? data["name"] : "";
+
     await showDialog(
         barrierDismissible: false,
         context: context,
@@ -146,51 +159,207 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
                                               folderTitleController.text.trim(),
                                           "listOfVideos": [],
                                           "createdDate": DateTime.now()
-                                              .millisecondsSinceEpoch
+                                              .millisecondsSinceEpoch,
+                                          "isDeleted": false
                                         };
                                         print("FOLDER $folderDetails");
 
-                                        await VideoServices()
-                                            .addFolder(
-                                                folderTitleController.text
-                                                    .trim(),
-                                                folderDetails)
-                                            .then((value) {
-                                          print(
-                                              "VALUE.ISSUCCESS ${value["isSuccess"]}");
-                                          if (value["isSuccess"]) {
-                                            setState(() {
-                                              isSavingFolder = false;
-                                            });
-                                            Navigator.pop(context);
-                                            toastMessage(
-                                                "Added the folder successfully",
-                                                cursorColour,
-                                                Icons.done);
-                                          } else {
-                                            setState(() {
-                                              isSavingFolder = false;
-                                            });
-                                            toastMessage(
-                                                "Oops! Something went wrong. ",
-                                                ERROR_RED,
-                                                Icons.error);
-                                          }
-                                        }).catchError((error) {
-                                          print("ERROR IS $error");
-                                          setState(() {
-                                            isSavingFolder = false;
-                                          });
-                                          toastMessage(
-                                              "Oops! Something went wrong. Please try again.",
-                                              ERROR_RED,
-                                              Icons.error);
-                                        });
+                                        isEdit
+                                            ? await VideoServices()
+                                                .renameFolder(
+                                                    folderTitleController.text
+                                                        .trim(),
+                                                    data.documentID)
+                                                .then((value) {
+                                                print(
+                                                    "VALUE.ISSUCCESS ${value["isSuccess"]}");
+                                                if (value["isSuccess"]) {
+                                                  setState(() {
+                                                    isSavingFolder = false;
+                                                  });
+                                                  Navigator.pop(context);
+                                                  toastMessage(
+                                                      "Renamed the folder successfully",
+                                                      cursorColour,
+                                                      Icons.done);
+                                                } else {
+                                                  setState(() {
+                                                    isSavingFolder = false;
+                                                  });
+                                                  toastMessage(
+                                                      "Oops! Something went wrong. ",
+                                                      ERROR_RED,
+                                                      Icons.error);
+                                                }
+                                              }).catchError((error) {
+                                                print("ERROR IS $error");
+                                                setState(() {
+                                                  isSavingFolder = false;
+                                                });
+                                                toastMessage(
+                                                    "Oops! Something went wrong. Please try again.",
+                                                    ERROR_RED,
+                                                    Icons.error);
+                                              })
+                                            : await VideoServices()
+                                                .addFolder(
+                                                    folderTitleController.text
+                                                        .trim(),
+                                                    folderDetails)
+                                                .then((value) {
+                                                print(
+                                                    "VALUE.ISSUCCESS ${value["isSuccess"]}");
+                                                if (value["isSuccess"]) {
+                                                  setState(() {
+                                                    isSavingFolder = false;
+                                                  });
+                                                  Navigator.pop(context);
+                                                  toastMessage(
+                                                      "Added the folder successfully",
+                                                      cursorColour,
+                                                      Icons.done);
+                                                } else {
+                                                  setState(() {
+                                                    isSavingFolder = false;
+                                                  });
+                                                  toastMessage(
+                                                      "Oops! Something went wrong. ",
+                                                      ERROR_RED,
+                                                      Icons.error);
+                                                }
+                                              }).catchError((error) {
+                                                print("ERROR IS $error");
+                                                setState(() {
+                                                  isSavingFolder = false;
+                                                });
+                                                toastMessage(
+                                                    "Oops! Something went wrong. Please try again.",
+                                                    ERROR_RED,
+                                                    Icons.error);
+                                              });
                                       }
                                     }
                                   },
                                   child: !isSavingFolder
-                                      ? Text("Save Folder",
+                                      ? Text(isEdit ? "Rename" : "Save Folder",
+                                          style: TextStyle(
+                                              color: SM_BACKGROUND_WHITE,
+                                              fontSize: 16.0))
+                                      : Center(
+                                          child: SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 3,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      SM_BACKGROUND_WHITE),
+                                            ),
+                                          ),
+                                        )),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          });
+        });
+  }
+
+  showDeleteDialog(BuildContext context, DocumentSnapshot data) async {
+    await showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, StateSetter setState) {
+            return Center(
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: SingleChildScrollView(
+                  child: Container(
+                    margin: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    width: width > 450 ? width / 3 : width,
+                    // height: 200,
+                    child: Column(
+                      children: [
+                        Container(
+                            height: 100,
+                            width: 100,
+                            child: Image.asset('assets/images/folderIcon.png')),
+                        Text(data["name"]),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text(
+                                  "Cancel",
+                                  style: TextStyle(
+                                      color: Colors.black54, fontSize: 16.0),
+                                )),
+                            SizedBox(width: 15.0),
+                            Container(
+                              width: 125,
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.red,
+                                    padding: EdgeInsets.all(18.0),
+                                  ),
+                                  onPressed: () async {
+                                    setState(() {
+                                      isSavingFolder = true;
+                                    });
+
+                                    await VideoServices()
+                                        .deleteFolder(data.documentID)
+                                        .then((value) {
+                                      print(
+                                          "VALUE.ISSUCCESS ${value["isSuccess"]}");
+                                      if (value["isSuccess"]) {
+                                        setState(() {
+                                          isSavingFolder = false;
+                                        });
+                                        Navigator.pop(context);
+                                        toastMessage(
+                                            "Deleted the folder successfully",
+                                            cursorColour,
+                                            Icons.done);
+                                      } else {
+                                        setState(() {
+                                          isSavingFolder = false;
+                                        });
+                                        toastMessage(
+                                            "Oops! Something went wrong. ",
+                                            ERROR_RED,
+                                            Icons.error);
+                                      }
+                                    }).catchError((error) {
+                                      print("ERROR IS $error");
+                                      setState(() {
+                                        isSavingFolder = false;
+                                      });
+                                      toastMessage(
+                                          "Oops! Something went wrong. Please try again.",
+                                          ERROR_RED,
+                                          Icons.error);
+                                    });
+                                  },
+                                  child: !isSavingFolder
+                                      ? Text("Delete Folder",
                                           style: TextStyle(
                                               color: SM_BACKGROUND_WHITE,
                                               fontSize: 16.0))
@@ -266,6 +435,7 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
     return StreamBuilder(
         stream: Firestore.instance
             .collection("videoFolders")
+            .where("isDeleted", isEqualTo: false)
             .orderBy('createdDate')
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -273,6 +443,7 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
             return Center(child: Text('Loading'));
           }
           if (snapshot.hasError) {
+            print(snapshot.error);
             return Center(child: Text('Error'));
           }
           if (snapshot.connectionState == ConnectionState.done) {
@@ -308,13 +479,23 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
 
   Widget folderCard(DocumentSnapshot data) {
     return GestureDetector(
+      onSecondaryTap:
+          dataSend['role'] == 'Admin' || dataSend['role'] == 'Professional'
+              ? () {
+                  print("Right clcik");
+                  showRightPressDialog(context, data);
+                }
+              : null,
       onTap: width < 400
           ? () {
               print("FOLDER OPENED");
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => VideosPage(dataSend: dataSend,
-                folderData: data,)),
+                MaterialPageRoute(
+                    builder: (context) => VideosPage(
+                          dataSend: dataSend,
+                          folderData: data,
+                        )),
               );
             }
           : null,
@@ -324,7 +505,11 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
               print("FOLDER OPENED");
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => VideosPage(dataSend: dataSend,folderData: data,)),
+                MaterialPageRoute(
+                    builder: (context) => VideosPage(
+                          dataSend: dataSend,
+                          folderData: data,
+                        )),
               );
             },
       child: Container(
@@ -345,5 +530,49 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
         ),
       ),
     );
+  }
+
+  showRightPressDialog(BuildContext context, DocumentSnapshot data) async {
+    await showDialog(
+        barrierDismissible: true,
+        context: context,
+        builder: (context) {
+          return Center(
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: SingleChildScrollView(
+                child: Container(
+                  margin: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  width: width > 400 ? 300 : width,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      InkWell(
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            showMessageDialog(context, true, data);
+                          },
+                          child: Text("Rename folder")),
+                      Divider(),
+                      InkWell(
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            showDeleteDialog(context, data);
+                          },
+                          child: Text("Delete folder",
+                              style: TextStyle(color: Colors.red))),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        });
   }
 }
