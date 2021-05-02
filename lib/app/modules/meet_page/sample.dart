@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:share_market/app_commons/constants.dart';
 
 class SampleWidget extends StatefulWidget {
   @override
@@ -85,7 +86,7 @@ class _SampleWidgetState extends State<SampleWidget> {
                   //   height: double.infinity,
                   //   width: double.infinity,
                   // )
-                  color: Colors.grey,
+                  color: SM_GREY,
                 )),
             SizedBox(width: 30),
             Container(

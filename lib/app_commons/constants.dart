@@ -55,3 +55,7 @@ Color cursorColour = Colors.green[700];
 Color backgroundOrangeColour = Colors.orange[50];
 const double cardBorderRadius = 10.0;
 const Color ERROR_RED = Colors.red;
+const Color SM_WHITE = Colors.white;
+const Color SM_BLUE = Colors.blue;
+Color black54 = Colors.black54;
+const Color SM_GREY = Colors.grey;

@@ -56,7 +56,7 @@ class _HomePageState extends State<HomePage>
 
       userDatas = value.data;
       controller = new TabController(
-          length: userDatas["role"] == "admin" ? 5 : 4, vsync: this);
+          length: userDatas["role"] == "Admin" ? 5 : 4, vsync: this);
     });
     return userDatas;
   }
@@ -66,7 +66,7 @@ class _HomePageState extends State<HomePage>
     return Scaffold(
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.orange[50],
+        backgroundColor: backgroundOrangeColour,
         centerTitle: true,
         title: Image.asset(
           'assets/images/logo_crop.png',
@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage>
           ),
         ],
       ),
-      backgroundColor: Colors.orange[50],
+      backgroundColor: backgroundOrangeColour,
       body: _isLoading ? _loadingCircle() : _buildContent(context),
     );
   }
@@ -119,13 +119,13 @@ class _HomePageState extends State<HomePage>
       children: [
         Container(
 //          width: MediaQuery.of(context).size.width / 4,
-          child: userDatas["role"] == "admin"
+          child: userDatas["role"] == "Admin"
               ? TabBar(
                   indicatorPadding: EdgeInsets.symmetric(horizontal: 10),
                   labelPadding: EdgeInsets.symmetric(horizontal: 1),
                   isScrollable: true,
                   labelStyle: TextStyle(fontSize: 16.0),
-                  labelColor: Colors.black,
+                  labelColor: SM_BLACK,
                   indicatorColor: SM_ORANGE,
                   controller: controller,
                   tabs: <Widget>[
@@ -163,22 +163,22 @@ class _HomePageState extends State<HomePage>
                         ),
                       ),
                       new Tab(
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 15.0, right: 15.0),
-                          child: Container(
-                            child: Text(
-                              "Users",
-                              style: TextStyle(fontFamily: "OpenSans-SemiBold"),
-                            ),
-                          ),
-                        ),
-                      ),
-                      new Tab(
                       child: Padding(
                         padding: EdgeInsets.only(left: 15.0, right: 15.0),
                         child: Container(
                           child: Text(
                             "Forums",
+                            style: TextStyle(fontFamily: "OpenSans-SemiBold"),
+                          ),
+                        ),
+                      ),
+                    ),
+                    new Tab(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 15.0, right: 15.0),
+                        child: Container(
+                          child: Text(
+                            "Users",
                             style: TextStyle(fontFamily: "OpenSans-SemiBold"),
                           ),
                         ),
@@ -190,7 +190,7 @@ class _HomePageState extends State<HomePage>
                   labelPadding: EdgeInsets.symmetric(horizontal: 1),
                   isScrollable: true,
                   labelStyle: TextStyle(fontSize: 16.0),
-                  labelColor: Colors.black,
+                  labelColor: SM_BLACK,
                   indicatorColor: SM_ORANGE,
                   controller: controller,
                   tabs: <Widget>[
@@ -240,7 +240,7 @@ class _HomePageState extends State<HomePage>
                     ),
                     ]),
         ),
-        userDatas["role"] == "admin"
+        userDatas["role"] == "Admin"
             ? Flexible(
                 child: TabBarView(
                 controller: controller,
@@ -248,8 +248,8 @@ class _HomePageState extends State<HomePage>
                   MeetPage(dataSend: userDatas),
                   VideoFoldersPage(dataSend: userDatas),
                   DocumentFoldersPage(dataSend: userDatas),
-                  UsersPage(dataSend: userDatas),
                   ForumsMainPage(dataSend: userDatas),
+                  UsersPage(dataSend: userDatas),
                 ],
               ))
             : Flexible(
@@ -288,7 +288,7 @@ class _HomePageState extends State<HomePage>
                 labelPadding: EdgeInsets.symmetric(horizontal: 1),
                 isScrollable: false,
                 labelStyle: TextStyle(fontSize: 16.0),
-                labelColor: Colors.black,
+                labelColor: SM_BLACK,
                 indicatorColor: SM_ORANGE,
                 controller: controller,
                 tabs: <Widget>[

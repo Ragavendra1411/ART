@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:share_market/app/modules/users_page/user_card.dart';
 import 'package:share_market/app/services/providers/user_provider.dart';
-import 'package:share_market/app_commons/ahcrm_text_field.dart';
+import 'package:share_market/app_commons/sm_text_field.dart';
 import 'package:share_market/app_commons/constants.dart';
 import 'package:share_market/app_commons/utilities.dart';
 
@@ -20,7 +20,11 @@ class _UsersPageState extends State<UsersPage> {
   _UsersPageState({@required this.dataSend});
 
   var width;
-
+  final _roleFocusNode = FocusNode();
+  Map<String, dynamic> _rolesData = {
+    "User": "User",
+    "Professional": "Professional",
+  };
   showMessageDialog(BuildContext context) async{
     final TextEditingController nameController = TextEditingController();
     final TextEditingController emailController = TextEditingController();
@@ -39,8 +43,6 @@ class _UsersPageState extends State<UsersPage> {
           formData["email"] = emailController.text.trim();
           formData["id"] = userIdController.text.trim();
           formData["password"] = passwordController.text.trim();
-          formData["role"] = "user";
-          print(nameController.text);
           if(formData["userName"] == null || formData["userName"] == ""){
             Utilities().toastMessage("Please add the User's Name", ERROR_RED, Icons.error, width, context);
           }else if(formData["email"] == null || formData["email"] == ""){
@@ -49,6 +51,8 @@ class _UsersPageState extends State<UsersPage> {
             Utilities().toastMessage("Please add the User ID", ERROR_RED, Icons.error, width, context);
           }else if(formData["password"] == null || formData["password"] == ""){
             Utilities().toastMessage("Please add the User's password", ERROR_RED, Icons.error, width, context);
+          }else if(formData["role"] == null || formData["role"] == ""){
+            Utilities().toastMessage("Please add the User's role", ERROR_RED, Icons.error, width, context);
           }else{
             setState((){
               isSavingUser = true;
@@ -95,7 +99,7 @@ class _UsersPageState extends State<UsersPage> {
                   width: width > 450 ? width / 3 : width,
                   child: Column(
                     children: [
-                      AhCrmTextField(
+                      SMTextField(
                         context: context,
                         nextFocusNode: null,
                         currentFocusNode: null,
@@ -111,7 +115,7 @@ class _UsersPageState extends State<UsersPage> {
                         isPaddingNeeded: false,
                         defaultTextFieldWidth: false,
                       ),
-                      AhCrmTextField(
+                      SMTextField(
                         context: context,
                         nextFocusNode: null,
                         currentFocusNode: null,
@@ -127,7 +131,7 @@ class _UsersPageState extends State<UsersPage> {
                         isPaddingNeeded: false,
                         defaultTextFieldWidth: false,
                       ),
-                      AhCrmTextField(
+                      SMTextField(
                         context: context,
                         nextFocusNode: null,
                         currentFocusNode: null,
@@ -143,7 +147,7 @@ class _UsersPageState extends State<UsersPage> {
                         isPaddingNeeded: false,
                         defaultTextFieldWidth: false,
                       ),
-                      AhCrmTextField(
+                      SMTextField(
                         context: context,
                         nextFocusNode: null,
                         currentFocusNode: null,
@@ -158,6 +162,77 @@ class _UsersPageState extends State<UsersPage> {
                         maxLines: 1,
                         isPaddingNeeded: false,
                         defaultTextFieldWidth: false,
+                      ),
+                      Container(
+                        color: SM_BACKGROUND_WHITE,
+                        margin: EdgeInsets.only(right: 5, top: 5),
+                        child: Theme(
+                          data: ThemeData(
+                            hintColor: SM_BORDER_GREY,
+                          ),
+                          child: Material(
+                            color: SM_BACKGROUND_WHITE,
+                            child: FormField<String>(
+                              builder: (FormFieldState<String> state) {
+                                return InputDecorator(
+                                  decoration: InputDecoration(
+                                      focusedBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: SM_ORANGE,
+                                          )),
+                                      enabledBorder: OutlineInputBorder(
+                                          borderSide: BorderSide(
+                                            color: SM_ORANGE,
+                                          )),
+                                      contentPadding:
+                                      EdgeInsets.fromLTRB(10.0, 0.0, 5.0, 0.0),
+                                      fillColor: SM_BACKGROUND_WHITE,
+                                      filled: true,
+                                      border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(5.0))),
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton<String>(
+                                      focusNode: _roleFocusNode,
+                                      onTap: () {
+                                        FocusScope.of(context).unfocus();
+                                      },
+                                      hint: Text("User Role",
+                                          style: TextStyle(
+                                              color: SM_TEXT_GREY,
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w300)),
+                                      dropdownColor: SM_BACKGROUND_WHITE,
+                                      style: TextStyle(
+                                        color: SM_BLACK,
+                                        fontSize: 16,
+                                      ),
+                                      value: formData["role"],
+                                      isDense: true,
+                                      focusColor: SM_BACKGROUND_WHITE,
+                                      isExpanded: true,
+                                      items: _rolesData
+                                          .map((dropDownItem, value) {
+                                        return MapEntry(
+                                            dropDownItem,
+                                            DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Text(dropDownItem),
+                                            ));
+                                      })
+                                          .values
+                                          .toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          formData["role"] = value;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
                       ),
                       SizedBox(height: 25.0),
                       Row(
@@ -217,7 +292,7 @@ class _UsersPageState extends State<UsersPage> {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     return Scaffold(
-      floatingActionButton: dataSend['role'] == 'admin'
+      floatingActionButton: dataSend['role'] == 'Admin'
           ? FloatingActionButton.extended(
         heroTag: null,
         onPressed: () {
@@ -236,7 +311,11 @@ class _UsersPageState extends State<UsersPage> {
       )
           : null,
       backgroundColor: backgroundOrangeColour,
-      body: meetingPageBody(),
+      body: Scrollbar(
+        child: SingleChildScrollView(
+          child: meetingPageBody(),
+        ),
+      ),
     );
   }
 
@@ -244,7 +323,7 @@ class _UsersPageState extends State<UsersPage> {
     return StreamBuilder(
         stream: Firestore.instance
             .collection("users")
-            .where("role",isEqualTo: "user")
+        .orderBy("userName")
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -262,7 +341,7 @@ class _UsersPageState extends State<UsersPage> {
           usersList = snapshot.data.documents;
 
           if (usersList.length == 0) {
-            return Center(child: Text("No meeting scheduled"));
+            return Center(child: Text("No Users"));
           } else {
             return listOfMeetings(usersList);
           }
@@ -271,9 +350,10 @@ class _UsersPageState extends State<UsersPage> {
 
   Widget listOfMeetings(List<DocumentSnapshot> users) {
     return Center(
-        child: Wrap(
-            spacing: 50.0,
-            runSpacing: 20.0,
-            children: users.map((e) => UserCard(cardData: e,pageWidth: width,)).toList()));
+      child: Wrap(
+          spacing: 50.0,
+          runSpacing: 20.0,
+          children: users.map((e) => UserCard(cardData: e,pageWidth: width,)).toList()),
+    );
   }
 }

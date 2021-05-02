@@ -3,7 +3,7 @@ import 'package:share_market/app/services/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class AhCrmTextField extends StatefulWidget with FieldValidators {
+class SMTextField extends StatefulWidget with FieldValidators {
   final BuildContext context;
   final FocusNode nextFocusNode;
   final FocusNode currentFocusNode;
@@ -19,7 +19,7 @@ class AhCrmTextField extends StatefulWidget with FieldValidators {
   final bool isPaddingNeeded;
   final bool defaultTextFieldWidth;
 
-  AhCrmTextField({
+  SMTextField({
     @required this.context,
     @required this.nextFocusNode,
     @required this.currentFocusNode,
@@ -36,7 +36,7 @@ class AhCrmTextField extends StatefulWidget with FieldValidators {
     @required this.defaultTextFieldWidth,
   });
   @override
-  _AhCrmTextFieldState createState() => _AhCrmTextFieldState(
+  _SMTextFieldState createState() => _SMTextFieldState(
         context: context,
         nextFocusNode: nextFocusNode,
         currentFocusNode: currentFocusNode,
@@ -54,7 +54,7 @@ class AhCrmTextField extends StatefulWidget with FieldValidators {
       );
 }
 
-class _AhCrmTextFieldState extends State<AhCrmTextField> {
+class _SMTextFieldState extends State<SMTextField> {
   final BuildContext context;
   final FocusNode nextFocusNode;
   final FocusNode currentFocusNode;
@@ -70,7 +70,7 @@ class _AhCrmTextFieldState extends State<AhCrmTextField> {
   final bool isPaddingNeeded;
   final bool defaultTextFieldWidth;
 
-  _AhCrmTextFieldState({
+  _SMTextFieldState({
     @required this.context,
     @required this.nextFocusNode,
     @required this.currentFocusNode,
@@ -153,7 +153,7 @@ class _AhCrmTextFieldState extends State<AhCrmTextField> {
                         _passwordVisible
                             ? Icons.visibility
                             : Icons.visibility_off,
-                        color: Colors.grey,
+                        color: SM_GREY,
                       ),
                       onPressed: () {
                         /// Toggle the state of passwordVisible variable
