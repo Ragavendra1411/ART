@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_market/app/modules/forgot_password/forgot_password.dart';
 import 'package:share_market/app/services/providers/signIn_provider.dart';
-import 'package:share_market/app_commons/ahcrm_text_field.dart';
+import 'package:share_market/app_commons/sm_text_field.dart';
 import 'package:share_market/app_commons/gradient_buttn.dart';
 
 import '../../../app_commons/constants.dart';
@@ -171,7 +171,7 @@ class _SigninPageState extends State<SigninPage> {
             padding: EdgeInsets.only(left: 5.0, bottom: 5.0),
             child: Column(
               children: [
-                AhCrmTextField(
+                SMTextField(
                   context: context,
                   nextFocusNode: null,
                   currentFocusNode: null,
@@ -187,7 +187,7 @@ class _SigninPageState extends State<SigninPage> {
                   isPaddingNeeded: false,
                   defaultTextFieldWidth: true,
                 ),
-                AhCrmTextField(
+                SMTextField(
                   context: context,
                   nextFocusNode: null,
                   currentFocusNode: null,

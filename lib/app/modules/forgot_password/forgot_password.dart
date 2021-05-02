@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_market/app/services/providers/signIn_provider.dart';
-import 'package:share_market/app_commons/ahcrm_text_field.dart';
+import 'package:share_market/app_commons/sm_text_field.dart';
 import 'package:share_market/app_commons/constants.dart';
 import 'package:share_market/app_commons/gradient_buttn.dart';
 import 'package:share_market/app_commons/utilities.dart';
@@ -89,7 +89,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
             padding: EdgeInsets.only(left: 5.0, bottom: 5.0),
             child: Column(
               children: [
-                AhCrmTextField(
+                SMTextField(
                   context: context,
                   nextFocusNode: null,
                   currentFocusNode: null,

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:share_market/app/modules/documents/documents.dart';
-import 'package:share_market/app_commons/ahcrm_text_field.dart';
+import 'package:share_market/app_commons/sm_text_field.dart';
 import 'package:share_market/app_commons/constants.dart';
 import 'package:share_market/services/document_services.dart';
 import 'package:share_market/services/video_services.dart';
@@ -26,8 +26,8 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
     width = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      floatingActionButton: dataSend['role'] == 'admin' ||
-              dataSend['role'] == 'professional'
+      floatingActionButton: dataSend['role'] == 'Admin' ||
+              dataSend['role'] == 'Professional'
           ? FloatingActionButton.extended(
               heroTag: null,
               onPressed: () {
@@ -85,7 +85,7 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
                           height: 20,
                         ),
                         // Text("FolderName"),
-                        AhCrmTextField(
+                        SMTextField(
                           context: context,
                           nextFocusNode: null,
                           currentFocusNode: null,

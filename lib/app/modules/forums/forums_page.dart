@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:share_market/app/modules/forums/expandable_desc.dart';
 import 'package:share_market/app/modules/forums/view_forum.dart';
 import 'package:share_market/app/modules/meet_page/view_more_text.dart';
-import 'package:share_market/app_commons/ahcrm_text_field.dart';
+import 'package:share_market/app_commons/sm_text_field.dart';
 import 'package:share_market/app_commons/constants.dart';
 import 'package:share_market/services/forum_services.dart';
 import 'package:universal_html/prefer_universal/html.dart' as html;
@@ -39,12 +39,103 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
     super.initState();
   }
 
+  confirmDelete(BuildContext context,DocumentSnapshot data) async{
+    bool isDeleting = false;
+    await showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (context, StateSetter setState){
+              return AlertDialog(
+                title: Text(
+                  "Deleting a forum",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+                content: Text(
+                  "Are you sure you want to delete this forum?",
+                  style: TextStyle(
+                    letterSpacing: 0.7,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                elevation: 5.0,
+                actions: <Widget>[
+                  new TextButton(
+                      child: new Text(
+                        "Cancel",
+                        style: TextStyle(
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context, rootNavigator: true).pop(context);
+                      }),
+                  new ElevatedButton(
+                      child: isDeleting? Center(
+                        child: SizedBox(
+                          height: 15,
+                          width: 15,
+                          child: CircularProgressIndicator(
+                            valueColor:
+                            AlwaysStoppedAnimation<
+                                Color>(SM_WHITE),
+                          ),
+                        ),
+                      ):new Text(
+                        "Delete",
+                        style: TextStyle(
+                          color: SM_WHITE,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      onPressed: () async{
+                        setState((){
+                          isDeleting = true;
+                        });
+                        await ForumServices()
+                            .deleteForums(data.documentID)
+                            .then((value) {
+                          setState((){
+                            isDeleting = true;
+                          });
+                          if (value["isSuccess"]) {
+                            Navigator.of(context).pop(context);
+                            toastMessage("Deleted the forum successfully",
+                                cursorColour, Icons.done);
+                          } else {
+                            toastMessage(
+                                "Oops! Something went wrong. Please try again.",
+                                ERROR_RED,
+                                Icons.error);
+                          }
+                        }).catchError((error) {
+                          setState((){
+                            isDeleting = true;
+                          });
+                          toastMessage(
+                              "Oops! Something went wrong. Please try again.",
+                              ERROR_RED,
+                              Icons.error);
+                        });
+                      }),
+                ],
+              );
+            },
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
     return Scaffold(
-      floatingActionButton: dataSend['role'] == 'admin'
+      floatingActionButton: dataSend['role'] == 'Admin'
           ? FloatingActionButton.extended(
               heroTag: null,
               onPressed: () {
@@ -53,11 +144,11 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
               label: Text(
                 ' ADD FORUM',
                 style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    TextStyle(color: SM_WHITE, fontWeight: FontWeight.bold),
               ),
               icon: Icon(
                 Icons.add,
-                color: Colors.white,
+                color: SM_WHITE,
               ),
               backgroundColor: SM_ORANGE,
             )
@@ -125,29 +216,53 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
         child: Container(
           padding: EdgeInsets.all(12),
           // height: 150,
-          height: 480,
+          height: dataSend["role"] == "Admin" || dataSend["role"] == "Professional" ? 480:430,
           width: width < 401 ? width : 400,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ClipRRect(
-                  borderRadius: BorderRadius.circular(5),
-                  child: Container(
-                    height: 200,
-                    child: data["forumImageUrl"] != null
-                        ? Image.network(
-                      data["forumImageUrl"].toString(),
-                      fit: BoxFit.cover,
-                      height: double.infinity,
-                      width: double.infinity,
-                    )
-                        : Image.asset("assets/images/logo.png"),
-                    color: Colors.transparent,
-                  )),
+             Center(
+               child:  ClipRRect(
+                   borderRadius: BorderRadius.circular(5),
+                   child: Container(
+                     height: 200,
+                     child: data["forumImageUrl"] != null
+                         ? Image.network(
+                       data["forumImageUrl"].toString(),
+                       fit: BoxFit.cover,
+                       height: double.infinity,
+                       width: double.infinity,
+                     )
+                         : Image.asset("assets/images/logo.png"),
+                     color: Colors.transparent,
+                   )),
+             ),
               SizedBox(height: 20),
               Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      dataSend['role'] == 'Admin'
+                          ? IconButton(
+                        icon: Icon(Icons.delete,color:SM_GREY,),
+                        onPressed: () {
+                          confirmDelete(context,data);
+                        },
+
+                      )
+                          : Container(),
+                      SizedBox(width: 10),
+                      dataSend["role"] == "Admin" || dataSend["role"] == "Professional"?IconButton(
+                        icon: Icon(Icons.edit,color: SM_GREY),
+                        onPressed: () async {
+                          showMessageDialog(context, true, data);
+                        },
+                      ):Container(),
+                    ],
+                  ),
                   Text(
                     data["title"],
                     maxLines: 1,
@@ -155,95 +270,6 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                   SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      dataSend['role'] == 'admin'
-                          ? ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: SM_RED,
-                          padding: EdgeInsets.all(18.0),
-                        ),
-                        onPressed: () async {
-                          await ForumServices()
-                              .deleteForums(data.documentID)
-                              .then((value) {
-                            if (value["isSuccess"]) {
-                              // setState(() {
-                              //   isSavingMeating = false;y
-                              // });
-                              toastMessage("Deleted the forum successfully",
-                                  cursorColour, Icons.done);
-                            } else {
-                              // setState(() {
-                              //   isSavingMeating = false;
-                              // });
-                              toastMessage(
-                                  "Oops! Something went wrong. Please try again.",
-                                  ERROR_RED,
-                                  Icons.error);
-                            }
-                          }).catchError((error) {
-                            // setState(() {
-                            //   isSavingMeating = false;
-                            // });
-                            toastMessage(
-                                "Oops! Something went wrong. Please try again.",
-                                ERROR_RED,
-                                Icons.error);
-                          });
-                        },
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.delete,
-                              color: Colors.white,
-                            ),
-                            Text(
-                              ' Delete Forum ',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  letterSpacing: 1.5,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      )
-                          : Container(),
-                      SizedBox(width: 10),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          primary: SM_ORANGE,
-                          padding: EdgeInsets.all(18.0),
-                        ),
-                        onPressed: () async {
-                          showMessageDialog(context, true, data);
-                          // var uri = data["meetingLink"];
-                          // if (await canLaunch(uri)) {
-                          //   await launch(uri);
-                          // } else {
-                          //   throw 'Could not launch $uri';
-                          // }
-                        },
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.edit,
-                              color: Colors.white,
-                            ),
-                            Text(
-                              ' Edit Forum ',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  letterSpacing: 1.5,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 10),
                   data['description'] != null &&
                       data['description'].toString().trim() != ""
                       ? Column(
@@ -273,7 +299,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                   InkWell(
                     child: Text('Click here to view the article',style: TextStyle(
                         fontSize: 14,
-                        color: Colors.blue
+                        color: SM_BLUE
                     ),),
                     onTap: () async {
                       var uri = data["forumLink"];
@@ -485,7 +511,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                                     decoration: BoxDecoration(
                                         borderRadius: BorderRadius.all(
                                             Radius.circular(cardBorderRadius)),
-                                        color: Colors.orange[50],
+                                        color: backgroundOrangeColour,
                                         border: Border.all(color: SM_ORANGE)),
                                     // button color
                                     child: isImageLoading
@@ -512,13 +538,12 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                                                       Icons
                                                           .add_photo_alternate_outlined,
                                                       size: 50,
-                                                      color: Colors.black54,
+                                                      color: black54,
                                                     ),
                                                     Text(
                                                       "Add Image",
                                                       style: TextStyle(
-                                                          color:
-                                                              Colors.black54),
+                                                          color:black54),
                                                     )
                                                   ],
                                                 )),
@@ -552,7 +577,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                                             borderRadius: BorderRadius.all(
                                                 Radius.circular(
                                                     cardBorderRadius)),
-                                            color: Colors.orange[50],
+                                            color: backgroundOrangeColour,
                                             border:
                                                 Border.all(color: SM_ORANGE)),
                                         // button color
@@ -582,7 +607,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                                                           Icons
                                                               .add_photo_alternate_outlined,
                                                           size: 50,
-                                                          color: Colors.black54,
+                                                          color: black54,
                                                         ),
                                                         Text(
                                                           "Add Image",
@@ -629,7 +654,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                                     },
                                   ),
 
-                        AhCrmTextField(
+                        SMTextField(
                           context: context,
                           nextFocusNode: null,
                           currentFocusNode: null,
@@ -645,7 +670,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                           isPaddingNeeded: false,
                           defaultTextFieldWidth: false,
                         ),
-                        AhCrmTextField(
+                        SMTextField(
                           context: context,
                           nextFocusNode: null,
                           currentFocusNode: null,
@@ -661,7 +686,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                           isPaddingNeeded: false,
                           defaultTextFieldWidth: false,
                         ),
-                        AhCrmTextField(
+                        SMTextField(
                           context: context,
                           nextFocusNode: null,
                           currentFocusNode: null,
@@ -688,7 +713,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                                 child: Text(
                                   "Cancel",
                                   style: TextStyle(
-                                      color: Colors.black54, fontSize: 16.0),
+                                      color: black54, fontSize: 16.0),
                                 )),
                             SizedBox(width: 15.0),
                             Container(

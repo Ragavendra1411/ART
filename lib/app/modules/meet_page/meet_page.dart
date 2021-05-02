@@ -12,7 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:share_market/app/modules/meet_page/enter_minutes_of_meeting.dart';
 import 'package:share_market/app/modules/meet_page/view_meet_details_card.dart';
 import 'package:share_market/app/modules/meet_page/view_more_text.dart';
-import 'package:share_market/app_commons/ahcrm_text_field.dart';
+import 'package:share_market/app_commons/sm_text_field.dart';
 import 'package:share_market/app_commons/constants.dart';
 import 'package:share_market/services/meetings_services.dart';
 import 'package:universal_html/prefer_universal/html.dart' as html;
@@ -364,7 +364,7 @@ class _MeetPageState extends State<MeetPage> {
                                   setImage();
                                 },
                               ),
-                        AhCrmTextField(
+                        SMTextField(
                           context: context,
                           nextFocusNode: null,
                           currentFocusNode: null,
@@ -380,7 +380,7 @@ class _MeetPageState extends State<MeetPage> {
                           isPaddingNeeded: false,
                           defaultTextFieldWidth: false,
                         ),
-                        AhCrmTextField(
+                        SMTextField(
                           context: context,
                           nextFocusNode: null,
                           currentFocusNode: null,
@@ -556,7 +556,7 @@ class _MeetPageState extends State<MeetPage> {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
     return Scaffold(
-      floatingActionButton: dataSend['role'] == 'admin'
+      floatingActionButton: dataSend['role'] == 'Admin'
           ? FloatingActionButton.extended(
               heroTag: null,
               onPressed: () {
@@ -684,7 +684,7 @@ class _MeetPageState extends State<MeetPage> {
                   children: [
                     Icon(
                       Icons.calendar_today,
-                      color: Colors.grey,
+                      color: SM_GREY,
                     ),
                     SizedBox(width: 6),
                     Text(
@@ -696,7 +696,7 @@ class _MeetPageState extends State<MeetPage> {
                     SizedBox(width: 10),
                     Icon(
                       Icons.access_time,
-                      color: Colors.grey,
+                      color: SM_GREY,
                     ),
                     SizedBox(width: 6),
                     Text(
@@ -713,7 +713,7 @@ class _MeetPageState extends State<MeetPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    dataSend['role'] == 'admin'
+                    dataSend['role'] == 'Admin'
                         ? ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               primary: SM_RED,
@@ -784,7 +784,7 @@ class _MeetPageState extends State<MeetPage> {
                   ],
                 ),
                 SizedBox(height: 10),
-                dataSend['role'] == 'admin'
+                dataSend['role'] == 'Admin'
                     ? ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           primary: cursorColour,
