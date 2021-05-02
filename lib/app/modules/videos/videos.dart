@@ -25,6 +25,7 @@ class _VideosPageState extends State<VideosPage> {
   final DocumentSnapshot folderData;
   bool isVideoLoading = false;
   bool isSavingVideo = false;
+  bool isSavingFolder = false;
 
   String videoUrl;
   var imageByte;
@@ -37,12 +38,13 @@ class _VideosPageState extends State<VideosPage> {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(centerTitle: true,
-      title: Text(folderData["name"]),
-      backgroundColor: backgroundOrangeColour,
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text(folderData["name"]),
+        backgroundColor: backgroundOrangeColour,
       ),
-      floatingActionButton: dataSend['role'] == 'admin' ||
-              dataSend['role'] == 'professional'
+      floatingActionButton: dataSend['role'] == 'Admin' ||
+              dataSend['role'] == 'Professional'
           ? FloatingActionButton.extended(
               heroTag: null,
               onPressed: () {
@@ -64,10 +66,7 @@ class _VideosPageState extends State<VideosPage> {
       body: Scrollbar(
         child: SingleChildScrollView(
           child: Column(
-            children: [
-              SizedBox(height: 30),
-              meetingPageBody()
-            ],
+            children: [SizedBox(height: 30), meetingPageBody()],
           ),
         ),
       ),
@@ -322,7 +321,9 @@ class _VideosPageState extends State<VideosPage> {
                                             Map<String, dynamic> videoData = {
                                               "title":
                                                   titleController.text.trim(),
-                                              "url": videoUrl
+                                              "url": videoUrl,
+                                              "createdDate": DateTime.now()
+                                                  .millisecondsSinceEpoch
                                             };
                                             VideoServices()
                                                 .addVideo(folderData.documentID,
@@ -395,13 +396,15 @@ class _VideosPageState extends State<VideosPage> {
     return StreamBuilder(
         stream: Firestore.instance
             .collection("videos")
-            .where("folderId", isEqualTo: folderData.documentID)
+            .where("folderId", isEqualTo: folderData.documentID).where("isDeleted",isEqualTo: false)
+            .orderBy("createdDate")
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: Text('Loading'));
           }
           if (snapshot.hasError) {
+            print(snapshot.error);
             return Center(child: Text('Error'));
           }
           if (snapshot.connectionState == ConnectionState.done) {
@@ -436,18 +439,22 @@ class _VideosPageState extends State<VideosPage> {
   }
 
   Widget folderCard(DocumentSnapshot data) {
-    return InkWell(
-      onTap:  () async{
-         var uri = data["url"];
-                        if (await canLaunch(uri)) {
-                          await launch(uri);
-                        } else {
-                          throw 'Could not launch $uri';
-                        }
-             
-            }
-         ,
-     
+    return GestureDetector(
+      onSecondaryTap:
+          dataSend['role'] == 'Admin' || dataSend['role'] == 'Professional'
+              ? () {
+                  print("Right clcik");
+                  showRightPressDialog(context, data);
+                }
+              : null,
+      onTap: () async {
+        var uri = data["url"];
+        if (await canLaunch(uri)) {
+          await launch(uri);
+        } else {
+          throw 'Could not launch $uri';
+        }
+      },
       child: Container(
         width: 100,
         child: Column(
@@ -466,5 +473,365 @@ class _VideosPageState extends State<VideosPage> {
         ),
       ),
     );
+  }
+
+  showRightPressDialog(BuildContext context, DocumentSnapshot data) async {
+    await showDialog(
+        barrierDismissible: true,
+        context: context,
+        builder: (context) {
+          return Center(
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              child: SingleChildScrollView(
+                child: Container(
+                  margin: EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  width: width > 400 ? 300 : width,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      InkWell(
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            // showMessageDialog(context, true, data);
+                            showEditDialog(context, data);
+                          },
+                          child: Text("Rename video")),
+                      Divider(),
+                      InkWell(
+                          onTap: () {
+                            Navigator.of(context).pop();
+                            showDeleteDialog(context, data);
+                          },
+                          child: Text("Delete video",
+                              style: TextStyle(color: Colors.red))),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
+  showDeleteDialog(BuildContext context, DocumentSnapshot data) async {
+    await showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, StateSetter setState) {
+            return Center(
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: SingleChildScrollView(
+                  child: Container(
+                    margin: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    width: width > 450 ? width / 3 : width,
+                    // height: 200,
+                    child: Column(
+                      children: [
+                        Container(
+                            height: 100,
+                            width: 100,
+                            child: Image.asset('assets/images/videoIcon.png')),
+                        Text(data["title"]),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text(
+                                  "Cancel",
+                                  style: TextStyle(
+                                      color: Colors.black54, fontSize: 16.0),
+                                )),
+                            SizedBox(width: 15.0),
+                            Container(
+                              width: 125,
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary: Colors.red,
+                                    padding: EdgeInsets.all(18.0),
+                                  ),
+                                  onPressed: () async {
+                                    setState(() {
+                                      isSavingFolder = true;
+                                    });
+
+                                    await VideoServices()
+                                        .deleteVideo(data.documentID,folderData.documentID)
+                                        .then((value) {
+                                      print(
+                                          "VALUE.ISSUCCESS ${value["isSuccess"]}");
+                                      if (value["isSuccess"]) {
+                                        setState(() {
+                                          isSavingFolder = false;
+                                        });
+                                        Navigator.pop(context);
+                                        toastMessage(
+                                            "Deleted the video successfully",
+                                            cursorColour,
+                                            Icons.done);
+                                      } else {
+                                        setState(() {
+                                          isSavingFolder = false;
+                                        });
+                                        toastMessage(
+                                            "Oops! Something went wrong. ",
+                                            ERROR_RED,
+                                            Icons.error);
+                                      }
+                                    }).catchError((error) {
+                                      print("ERROR IS $error");
+                                      setState(() {
+                                        isSavingFolder = false;
+                                      });
+                                      toastMessage(
+                                          "Oops! Something went wrong. Please try again.",
+                                          ERROR_RED,
+                                          Icons.error);
+                                    });
+                                  },
+                                  child: !isSavingFolder
+                                      ? Text("Delete Video",
+                                          style: TextStyle(
+                                              color: SM_BACKGROUND_WHITE,
+                                              fontSize: 16.0))
+                                      : Center(
+                                          child: SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 3,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      SM_BACKGROUND_WHITE),
+                                            ),
+                                          ),
+                                        )),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          });
+        });
+  }
+
+  void toastMessage(String message, Color colour, IconData icon) {
+    final snackBar = SnackBar(
+        width: width > 400 ? 500 : width,
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Icon(
+              icon,
+              color: SM_BACKGROUND_WHITE,
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            new Flexible(
+                child: Text(
+              message,
+              softWrap: true,
+              style: TextStyle(
+                  color: SM_BACKGROUND_WHITE, fontWeight: FontWeight.w600),
+            )),
+          ],
+        ),
+        backgroundColor: colour,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        ));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  showEditDialog(BuildContext context, DocumentSnapshot data) async {
+    titleController.text = data["title"];
+    await showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(builder: (context, StateSetter setState) {
+            return Center(
+              child: Card(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: SingleChildScrollView(
+                  child: Container(
+                    margin: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
+                    width: width > 450 ? width / 3 : width,
+                    // height: 200,
+                    child: Column(
+                      children: [
+                        Container(
+                            height: 100,
+                            width: 100,
+                            child: Image.asset('assets/images/videoIcon.png')),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        // Text("FolderName"),
+                        AhCrmTextField(
+                          context: context,
+                          nextFocusNode: null,
+                          currentFocusNode: null,
+                          title: "Video Name",
+                          controller: titleController,
+                          formDataMapKey: null,
+                          keyboardTypeDone: false,
+                          isEmailField: false,
+                          isNumberKeyboard: false,
+                          isMandatoryField: true,
+                          formData: null,
+                          maxLines: 1,
+                          isPaddingNeeded: false,
+                          defaultTextFieldWidth: false,
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text(
+                                  "Cancel",
+                                  style: TextStyle(
+                                      color: Colors.black54, fontSize: 16.0),
+                                )),
+                            SizedBox(width: 15.0),
+                            Container(
+                              width: 125,
+                              child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary: SM_ORANGE,
+                                    padding: EdgeInsets.all(18.0),
+                                  ),
+                                  onPressed: () async {
+                                    if (titleController.text.isEmpty) {
+                                      toastMessage("Enter a folder name",
+                                          ERROR_RED, Icons.error);
+                                    } else {
+                                      setState(() {
+                                        isSavingFolder = true;
+                                      });
+                                      bool folderExists =
+                                          await checkIfVideoExists();
+                                      print("FOLDER EXISTS $folderExists");
+                                      if (folderExists == true) {
+                                        setState(() {
+                                          isSavingFolder = false;
+                                        });
+                                        toastMessage("Video already exists",
+                                            ERROR_RED, Icons.error);
+                                      } else {
+                                        await VideoServices()
+                                            .renameVideo(
+                                                titleController.text.trim(),
+                                                data.documentID)
+                                            .then((value) {
+                                          print(
+                                              "VALUE.ISSUCCESS ${value["isSuccess"]}");
+                                          if (value["isSuccess"]) {
+                                            setState(() {
+                                              isSavingFolder = false;
+                                            });
+                                            Navigator.pop(context);
+                                            toastMessage(
+                                                "Renamed the video successfully",
+                                                cursorColour,
+                                                Icons.done);
+                                          } else {
+                                            setState(() {
+                                              isSavingFolder = false;
+                                            });
+                                            toastMessage(
+                                                "Oops! Something went wrong. ",
+                                                ERROR_RED,
+                                                Icons.error);
+                                          }
+                                        }).catchError((error) {
+                                          print("ERROR IS $error");
+                                          setState(() {
+                                            isSavingFolder = false;
+                                          });
+                                          toastMessage(
+                                              "Oops! Something went wrong. Please try again.",
+                                              ERROR_RED,
+                                              Icons.error);
+                                        });
+                                      }
+                                    }
+                                  },
+                                  child: !isSavingFolder
+                                      ? Text("Rename",
+                                          style: TextStyle(
+                                              color: SM_BACKGROUND_WHITE,
+                                              fontSize: 16.0))
+                                      : Center(
+                                          child: SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 3,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                      SM_BACKGROUND_WHITE),
+                                            ),
+                                          ),
+                                        )),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            );
+          });
+        });
+  }
+
+   Future<bool> checkIfVideoExists() async {
+    bool val;
+    await VideoServices()
+        .checkIfVideoExists(titleController.text.trim())
+        .then((value) {
+      print("VALUE INSIDE FUNCTION $value");
+      val = value;
+    });
+    return val;
+    // return true;
   }
 }
