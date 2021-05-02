@@ -248,6 +248,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                       dataSend['role'] == 'Admin'
                           ? IconButton(
                         icon: Icon(Icons.delete,color:SM_GREY,),
+                        tooltip: "Delete forum",
                         onPressed: () {
                           confirmDelete(context,data);
                         },
@@ -257,6 +258,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                       SizedBox(width: 10),
                       dataSend["role"] == "Admin" || dataSend["role"] == "Professional"?IconButton(
                         icon: Icon(Icons.edit,color: SM_GREY),
+                        tooltip: "Edit forum",
                         onPressed: () async {
                           showMessageDialog(context, true, data);
                         },

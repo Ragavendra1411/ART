@@ -311,7 +311,11 @@ class _UsersPageState extends State<UsersPage> {
       )
           : null,
       backgroundColor: backgroundOrangeColour,
-      body: meetingPageBody(),
+      body: Scrollbar(
+        child: SingleChildScrollView(
+          child: meetingPageBody(),
+        ),
+      ),
     );
   }
 
@@ -346,9 +350,10 @@ class _UsersPageState extends State<UsersPage> {
 
   Widget listOfMeetings(List<DocumentSnapshot> users) {
     return Center(
-        child: Wrap(
-            spacing: 50.0,
-            runSpacing: 20.0,
-            children: users.map((e) => UserCard(cardData: e,pageWidth: width,)).toList()));
+      child: Wrap(
+          spacing: 50.0,
+          runSpacing: 20.0,
+          children: users.map((e) => UserCard(cardData: e,pageWidth: width,)).toList()),
+    );
   }
 }

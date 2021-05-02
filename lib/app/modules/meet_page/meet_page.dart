@@ -588,11 +588,9 @@ class _MeetPageState extends State<MeetPage> {
   //***************************************LIST OF MEETINGS*********************************************************************
 
   Widget meetingPageBody() {
-    DateTime currentTime = DateTime.now();
     return StreamBuilder(
         stream: Firestore.instance
             .collection("meetings")
-            .where("endTime", isGreaterThan: currentTime)
             .where("isCancelled", isEqualTo: false)
             .orderBy('endTime')
             .snapshots(),

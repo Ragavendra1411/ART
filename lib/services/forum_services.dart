@@ -55,7 +55,6 @@ class ForumServices {
         .collection("questions")
         .add(questionData)
         .then((value) {
-      print("In then - ${value.toString()}");
       response = {"isError": false, "data": value};
     }).catchError((error) {
       response = {"isError": true, "data": error};
@@ -78,7 +77,6 @@ class ForumServices {
           .document(documentId)
           .collection("questions")
           .document(questionId).updateData({"replyCount":FieldValue.increment(1)}).then((replyIncrementValue){
-        print("In then - ${value.toString()}");
         response = {"isError": false, "data": value,"message":"Successfully incremented the reply count"};
       }).catchError((error){
         response = {"isError": true, "data": error,"message":"Error in incrementing reply count"};
@@ -105,6 +103,12 @@ class ForumServices {
         .document(questionId)
         .collection("replies")
         .orderBy("updatedAt", descending: true)
+        .snapshots();
+  }
+
+  Stream<dynamic> forumStream(String forumId) {
+    return userRef
+        .document(forumId)
         .snapshots();
   }
 }

@@ -3,9 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class UserProviderServices {
   CollectionReference userRef = Firestore.instance.collection("users");
-  Map responseMap = {};
   var error;
   Future addUser(Map data) async {
+    Map responseMap = {};
     await userRef
         .where("id", isEqualTo: data["id"].toString())
         .getDocuments()
@@ -45,6 +45,24 @@ class UserProviderServices {
         responseMap["isSuccess"] = false;
         responseMap["message"] = "Account already exists with this User ID";
       }
+    });
+
+    return responseMap;
+  }
+
+  Future editUser(Map data,String userDataId) async {
+    Map responseMap = {};
+    await userRef
+        .document(userDataId)
+        .updateData(data)
+        .then((value) {
+      responseMap["isSuccess"] = true;
+    }).onError((error, stackTrace) {
+      responseMap["isSuccess"] = false;
+      print("Error - $error");
+    }).catchError((error) {
+      responseMap["isSuccess"] = false;
+      print("Error - $error");
     });
 
     return responseMap;
