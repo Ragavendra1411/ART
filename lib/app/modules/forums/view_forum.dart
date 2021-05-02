@@ -8,7 +8,6 @@ import 'package:validators/validators.dart';
 
 import '../../../app_commons/sm_text_field.dart';
 import '../../../app_commons/constants.dart';
-import '../../../app_commons/constants.dart';
 import '../../../app_commons/utilities.dart';
 import '../../../services/forum_services.dart';
 import 'expandable_desc.dart';
@@ -32,7 +31,7 @@ class _ViewForumState extends State<ViewForum> {
   var imageByte;
   bool showQuestionTextBox = false;
   bool showLoader = false;
-
+  bool deleteSuccess = false;
   _ViewForumState({@required this.data, @required this.dataSend});
 
   var width;
@@ -686,424 +685,473 @@ class _ViewForumState extends State<ViewForum> {
         });
   }
 
+  confirmDelete(BuildContext context,DocumentSnapshot data) async{
+    bool isDeleting = false;
+    await showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return StatefulBuilder(
+            builder: (context, StateSetter setState){
+              return AlertDialog(
+                title: Text(
+                  "Deleting a forum",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+                content: Text(
+                  "Are you sure you want to delete this forum?",
+                  style: TextStyle(
+                    letterSpacing: 0.7,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                elevation: 5.0,
+                actions: <Widget>[
+                  new TextButton(
+                      child: new Text(
+                        "Cancel",
+                        style: TextStyle(
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context, rootNavigator: true).pop(context);
+                      }),
+                  new ElevatedButton(
+                      child: isDeleting? Center(
+                        child: SizedBox(
+                          height: 15,
+                          width: 15,
+                          child: CircularProgressIndicator(
+                            valueColor:
+                            AlwaysStoppedAnimation<
+                                Color>(SM_WHITE),
+                          ),
+                        ),
+                      ):new Text(
+                        "Delete",
+                        style: TextStyle(
+                          color: SM_WHITE,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      onPressed: () async{
+                        setState((){
+                          isDeleting = true;
+                        });
+                        await ForumServices()
+                            .deleteForums(data.documentID)
+                            .then((value) {
+                          setState((){
+                            isDeleting = false;
+                          });
+                          if (value["isSuccess"]) {
+                            deleteSuccess = true;
+                            Navigator.pop(context);
+                            Utilities().toastMessage(
+                                "Deleted the forum successfully",
+                                cursorColour,
+                                Icons.done,
+                                width,
+                                context);
+                            Future.delayed(Duration(seconds: 5),(){
+                              Navigator.of(context,rootNavigator: true).pop();
+                            });
+                          } else {
+                            Utilities().toastMessage(
+                                "Oops! Something went wrong. Please try again.",
+                                ERROR_RED,
+                                Icons.error,
+                                width,
+                                context);
+                          }
+                        }).catchError((error) {
+                          setState((){
+                            isDeleting = false;
+                          });
+                          Utilities().toastMessage(
+                              "Oops! Something went wrong. Please try again.",
+                              ERROR_RED,
+                              Icons.error,
+                              width,
+                              context);
+                        });
+                      }),
+                ],
+              );
+            },
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: backgroundOrangeColour,
-      body: Scrollbar(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  padding: EdgeInsets.all(12),
-                  // height: 150,
+      body:StreamBuilder(
+        stream: ForumServices().forumStream(data.documentID.toString()),
+    builder: (context, snapshot) {
+          if(snapshot.hasData){
+            var forumData = snapshot.data;
+            return  Scrollbar(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        padding: EdgeInsets.all(12),
+                        // height: 150,
 //              height: 480,
-                  width: width < 401 ? width : 400,
-                  child: Column(
-                    children: [
-                      ClipRRect(
-                          borderRadius: BorderRadius.circular(5),
-                          child: Container(
-                            height: 200,
-                            child: data["forumImageUrl"] != null
-                                ? Image.network(
-                              data["forumImageUrl"].toString(),
-                              fit: BoxFit.cover,
-                              height: double.infinity,
-                              width: double.infinity,
-                            )
-                                : Image.asset("assets/images/logo.png"),
-                            color: Colors.transparent,
-                          )),
-                      SizedBox(height: 20),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                data["title"],
-                                textAlign: TextAlign.end,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
-                              )
-                            ],
-                          ),
-                          SizedBox(height: 12),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              dataSend['role'] == 'Admin'
-                                  ? ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  primary: SM_RED,
-                                  padding: EdgeInsets.all(18.0),
-                                ),
-                                onPressed: () async {
-                                  await ForumServices()
-                                      .deleteForums(data.documentID)
-                                      .then((value) {
-                                    if (value["isSuccess"]) {
-                                      // setState(() {
-                                      //   isSavingMeating = false;y
-                                      // });
-                                      Utilities().toastMessage(
-                                          "Deleted the forum successfully",
-                                          cursorColour,
-                                          Icons.done,
-                                          width,
-                                          context);
-                                    } else {
-                                      // setState(() {
-                                      //   isSavingMeating = false;
-                                      // });
-                                      Utilities().toastMessage(
-                                          "Oops! Something went wrong. Please try again.",
-                                          ERROR_RED,
-                                          Icons.error,
-                                          width,
-                                          context);
+                        width: width < 401 ? width : 400,
+                        child: Column(
+                          children: [
+                            ClipRRect(
+                                borderRadius: BorderRadius.circular(5),
+                                child: Container(
+                                  height: 200,
+                                  child: forumData["forumImageUrl"] != null
+                                      ? Image.network(
+                                    forumData["forumImageUrl"].toString(),
+                                    fit: BoxFit.cover,
+                                    height: double.infinity,
+                                    width: double.infinity,
+                                  )
+                                      : Image.asset("assets/images/logo.png"),
+                                  color: Colors.transparent,
+                                )),
+                            SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                dataSend['role'] == 'Admin'
+                                    ? IconButton(
+                                  icon: Icon(Icons.delete,color:SM_GREY,),
+                                  tooltip: "Delete forum",
+                                  onPressed: () async{
+                                    await confirmDelete(context,forumData);
+                                    if(deleteSuccess){
+                                      Navigator.of(context,rootNavigator: true).pop();
                                     }
-                                  }).catchError((error) {
-                                    // setState(() {
-                                    //   isSavingMeating = false;
-                                    // });
-                                    Utilities().toastMessage(
-                                        "Oops! Something went wrong. Please try again.",
-                                        ERROR_RED,
-                                        Icons.error,
-                                        width,
-                                        context);
-                                  });
-                                },
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.delete,
-                                      color: SM_WHITE,
-                                    ),
-                                    Text(
-                                      ' Delete Forum ',
-                                      style: TextStyle(
-                                          color: SM_WHITE,
-                                          letterSpacing: 1.5,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                              )
-                                  : Container(),
-                              dataSend["role"] == "Admin" || dataSend["role"] == "Professional"?SizedBox(width: 10):Container(),
-                              dataSend["role"] == "Admin" || dataSend["role"] == "Professional" ?ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  primary: SM_ORANGE,
-                                  padding: EdgeInsets.all(18.0),
-                                ),
-                                onPressed: () async {
-                                  showMessageDialog(context, true, data);
-                                  // var uri = data["meetingLink"];
-                                  // if (await canLaunch(uri)) {
-                                  //   await launch(uri);
-                                  // } else {
-                                  //   throw 'Could not launch $uri';
-                                  // }
-                                },
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.edit,
-                                      color: SM_WHITE,
-                                    ),
-                                    Text(
-                                      ' Edit Forum ',
-                                      style: TextStyle(
-                                          color: SM_WHITE,
-                                          letterSpacing: 1.5,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
-                              ):Container(),
-                            ],
-                          ),
-                          SizedBox(height: 10),
-                          data['description'] != null &&
-                              data['description'].toString().trim() != ""
-                              ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                height: 20.0,
-                              ),
-                              Text(
-                                "Description:",
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              ExpandableTextForum(
-                                  data['description'].toString().trim(),
-                                  data,
-                                  width,
-                                  dataSend["role"].toString()),
-                            ],
-                          )
-                              : Container(),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          InkWell(
-                            child: Text(
-                              'Click here to view the article',
-                              style: TextStyle(fontSize: 14, color: SM_BLUE),
+                                  },
+
+                                )
+                                    : Container(),
+                                SizedBox(width: 10),
+                                dataSend["role"] == "Admin" || dataSend["role"] == "Professional"?IconButton(
+                                  icon: Icon(Icons.edit,color: SM_GREY),
+                                  tooltip: "Edit forum",
+                                  onPressed: () async {
+                                    showMessageDialog(context, true, forumData);
+                                  },
+                                ):Container(),
+                              ],
                             ),
-                            onTap: () async {
-                              var uri = data["forumLink"];
-                              if (await canLaunch(uri)) {
-                                await launch(uri);
-                              } else {
-                                throw 'Could not launch $uri';
-                              }
-                            },
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          showQuestionTextBox
-                              ? Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(
-                                width: width>401?320:width - 50,
-                                child: SMTextField(
-                                  context: context,
-                                  nextFocusNode: null,
-                                  currentFocusNode: null,
-                                  title: "Ask a question",
-                                  controller: questionController,
-                                  formDataMapKey: null,
-                                  keyboardTypeDone: false,
-                                  isEmailField: true,
-                                  isNumberKeyboard: false,
-                                  isMandatoryField: true,
-                                  formData: null,
-                                  maxLines: 3,
-                                  isPaddingNeeded: true,
-                                  defaultTextFieldWidth: false,
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      forumData["title"],
+                                      textAlign: TextAlign.end,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                          fontSize: 16, fontWeight: FontWeight.bold),
+                                    )
+                                  ],
                                 ),
-                              ),
-                              showLoader
-                                  ? SizedBox(
-                                height: 30,
-                                width: 30,
-                                child: CircularProgressIndicator(
-                                  valueColor:
-                                  AlwaysStoppedAnimation<Color>(
-                                      SM_ORANGE),
+                                SizedBox(height: 10),
+                                forumData['description'] != null &&
+                                    forumData['description'].toString().trim() != ""
+                                    ? Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      height: 20.0,
+                                    ),
+                                    Text(
+                                      "Description:",
+                                      style: TextStyle(fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    ExpandableTextForum(
+                                        forumData['description'].toString().trim(),
+                                        forumData,
+                                        width,
+                                        dataSend["role"].toString()),
+                                  ],
+                                )
+                                    : Container(),
+                                SizedBox(
+                                  height: 10,
                                 ),
-                              )
-                                  : IconButton(
-                                  icon: questionController.text.isEmpty? Icon(Icons.cancel,color: SM_GREY,):Icon(Icons.send),
-                                  onPressed: () {
-                                    if(questionController.text.isEmpty){
-                                      setState(() {
-                                        showQuestionTextBox = false;
-                                      });
-                                    }else{
-                                      Map<String, dynamic> questionData = {
-                                        "question": questionController.text,
-                                        "createdAt": DateTime.now()
-                                            .millisecondsSinceEpoch
-                                            .toString(),
-                                        "updatedAt": DateTime.now()
-                                            .millisecondsSinceEpoch
-                                            .toString(),
-                                        "replyCount": 0,
-                                        "userId": dataSend["userUid"],
-                                        "userName": dataSend["userName"],
-                                      };
-                                      setState(() {
-                                        showLoader = true;
-                                      });
-                                      ForumServices()
-                                          .askQuestionFunction(
-                                          data.documentID.toString(),
-                                          questionData)
-                                          .then((value) {
-                                        if (!value["isError"]) {
-                                          questionController.clear();
-                                          setState(() {
-                                            showLoader = false;
-                                            showQuestionTextBox = false;
-                                          });
-                                        } else {
-                                          setState(() {
-                                            showLoader = false;
-                                          });
-                                          Utilities().toastMessage(
-                                              "Oops! Something went wrong. Please try again later.",
-                                              ERROR_RED,
-                                              Icons.error,
-                                              width,
-                                              context);
-                                        }
-                                      }).catchError((error) {
-                                        setState(() {
-                                          showLoader = false;
-                                        });
-                                        print("error");
-                                        Utilities().toastMessage(
-                                            "Oops! Something went wrong. Please try again later.",
-                                            ERROR_RED,
-                                            Icons.error,
-                                            width,
-                                            context);
-                                      });
+                                InkWell(
+                                  child: Text(
+                                    'Click here to view the article',
+                                    style: TextStyle(fontSize: 14, color: SM_BLUE),
+                                  ),
+                                  onTap: () async {
+                                    var uri = forumData["forumLink"];
+                                    if (await canLaunch(uri)) {
+                                      await launch(uri);
+                                    } else {
+                                      throw 'Could not launch $uri';
                                     }
-                                  })
-                            ],
-                          )
-                              : Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              SizedBox(
-                                height: 10,
-                              ),
-                              InkWell(
-                                onTap: () {
-                                  setState(() {
-                                    showQuestionTextBox = true;
-                                  });
-                                },
-                                child: Text("Ask a question",style: TextStyle(color: SM_GREY),),
-                              )
-                            ],
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          StreamBuilder(
-                              stream: ForumServices()
-                                  .questionsStream(data.documentID.toString()),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  var questionsList = snapshot.data.documents;
-                                  return ListView.builder(
-                                      physics: NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemCount: questionsList.length,
-                                      itemBuilder: (context, index) {
-                                        return Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            SizedBox(
-                                              height: 5,
-                                            ),
-                                            Text(
-                                              "Q",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 18),
-                                            ),
-                                            SizedBox(
-                                              height: 5,
-                                            ),
-                                            Padding(
-                                              padding: EdgeInsets.only(top: 10),
-                                              child: Column(
+                                  },
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                showQuestionTextBox
+                                    ? Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SizedBox(
+                                      width: width>401?320:width - 50,
+                                      child: SMTextField(
+                                        context: context,
+                                        nextFocusNode: null,
+                                        currentFocusNode: null,
+                                        title: "Ask a question",
+                                        controller: questionController,
+                                        formDataMapKey: null,
+                                        keyboardTypeDone: false,
+                                        isEmailField: true,
+                                        isNumberKeyboard: false,
+                                        isMandatoryField: true,
+                                        formData: null,
+                                        maxLines: 3,
+                                        isPaddingNeeded: true,
+                                        defaultTextFieldWidth: false,
+                                      ),
+                                    ),
+                                    showLoader
+                                        ? SizedBox(
+                                      height: 30,
+                                      width: 30,
+                                      child: CircularProgressIndicator(
+                                        valueColor:
+                                        AlwaysStoppedAnimation<Color>(
+                                            SM_ORANGE),
+                                      ),
+                                    )
+                                        : IconButton(
+                                        icon: questionController.text.isEmpty? Icon(Icons.cancel,color: SM_GREY,):Icon(Icons.send),
+                                        onPressed: () {
+                                          if(questionController.text.isEmpty){
+                                            setState(() {
+                                              showQuestionTextBox = false;
+                                            });
+                                          }else{
+                                            Map<String, dynamic> questionData = {
+                                              "question": questionController.text,
+                                              "createdAt": DateTime.now()
+                                                  .millisecondsSinceEpoch
+                                                  .toString(),
+                                              "updatedAt": DateTime.now()
+                                                  .millisecondsSinceEpoch
+                                                  .toString(),
+                                              "replyCount": 0,
+                                              "userId": dataSend["userUid"],
+                                              "userName": dataSend["userName"],
+                                            };
+                                            setState(() {
+                                              showLoader = true;
+                                            });
+                                            ForumServices()
+                                                .askQuestionFunction(
+                                                data.documentID.toString(),
+                                                questionData)
+                                                .then((value) {
+                                              if (!value["isError"]) {
+                                                questionController.clear();
+                                                setState(() {
+                                                  showLoader = false;
+                                                  showQuestionTextBox = false;
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  showLoader = false;
+                                                });
+                                                Utilities().toastMessage(
+                                                    "Oops! Something went wrong. Please try again later.",
+                                                    ERROR_RED,
+                                                    Icons.error,
+                                                    width,
+                                                    context);
+                                              }
+                                            }).catchError((error) {
+                                              setState(() {
+                                                showLoader = false;
+                                              });
+                                              print("error");
+                                              Utilities().toastMessage(
+                                                  "Oops! Something went wrong. Please try again later.",
+                                                  ERROR_RED,
+                                                  Icons.error,
+                                                  width,
+                                                  context);
+                                            });
+                                          }
+                                        })
+                                  ],
+                                )
+                                    : Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          showQuestionTextBox = true;
+                                        });
+                                      },
+                                      child: Text("Ask a question",style: TextStyle(color: SM_GREY),),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                StreamBuilder(
+                                    stream: ForumServices()
+                                        .questionsStream(data.documentID.toString()),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasData) {
+                                        var questionsList = snapshot.data.documents;
+                                        return ListView.builder(
+                                            physics: NeverScrollableScrollPhysics(),
+                                            shrinkWrap: true,
+                                            itemCount: questionsList.length,
+                                            itemBuilder: (context, index) {
+                                              return Column(
                                                 crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                                 children: [
-                                                  RichText(
-                                                    text: TextSpan(
-                                                      children: <TextSpan>[
-                                                        TextSpan(
-                                                          text:
-                                                          "${questionsList[index]["userName"]}: ",
-                                                          style: TextStyle(
-                                                              fontWeight:
-                                                              FontWeight.bold),
-                                                        ),
-                                                        TextSpan(
-                                                          text: questionsList[index]
-                                                          ["question"],
-                                                        ),
-                                                      ],
-                                                    ),
+                                                  SizedBox(
+                                                    height: 5,
                                                   ),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                    MainAxisAlignment.end,
-                                                    children: [
-                                                      InkWell(
-                                                        onTap: questionsList[index]["replyCount"]==0?null:() {
-                                                          showCommentCard(context,
-                                                              questionsList[index]);
-                                                        },
-                                                        child: Text("${questionsList[index]["replyCount"]} ${questionsList[index]["replyCount"]!=1?'replies':'reply'}",style: TextStyle(color: SM_GREY),),
-                                                      ),
-                                                      SizedBox(width: 10.0,),
-                                                      InkWell(
-                                                        onTap: () {
-                                                          showCommentCard(context,
-                                                              questionsList[index]);
-                                                        },
-                                                        child: Text(
-                                                          'Reply',
-                                                          style: TextStyle(
-                                                            color: SM_GREY,
-                                                            decoration:
-                                                            TextDecoration
-                                                                .underline,
+                                                  Text(
+                                                    "Q",
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 18),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 5,
+                                                  ),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(top: 10),
+                                                    child: Column(
+                                                      crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                      children: [
+                                                        RichText(
+                                                          text: TextSpan(
+                                                            children: <TextSpan>[
+                                                              TextSpan(
+                                                                text:
+                                                                "${questionsList[index]["userName"]}: ",
+                                                                style: TextStyle(
+                                                                    fontWeight:
+                                                                    FontWeight.bold),
+                                                              ),
+                                                              TextSpan(
+                                                                text: questionsList[index]
+                                                                ["question"],
+                                                              ),
+                                                            ],
                                                           ),
                                                         ),
-                                                      )
-                                                    ],
+                                                        Row(
+                                                          mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                          children: [
+                                                            InkWell(
+                                                              onTap: questionsList[index]["replyCount"]==0?null:() {
+                                                                showCommentCard(context,
+                                                                    questionsList[index]);
+                                                              },
+                                                              child: Text("${questionsList[index]["replyCount"]} ${questionsList[index]["replyCount"]!=1?'replies':'reply'}",style: TextStyle(color: SM_GREY),),
+                                                            ),
+                                                            SizedBox(width: 10.0,),
+                                                            InkWell(
+                                                              onTap: () {
+                                                                showCommentCard(context,
+                                                                    questionsList[index]);
+                                                              },
+                                                              child: Text(
+                                                                'Reply',
+                                                                style: TextStyle(
+                                                                  color: SM_GREY,
+                                                                  decoration:
+                                                                  TextDecoration
+                                                                      .underline,
+                                                                ),
+                                                              ),
+                                                            )
+                                                          ],
+                                                        )
+                                                      ],
+                                                    ),
                                                   )
                                                 ],
-                                              ),
-                                            )
-                                          ],
+                                              );
+                                            });
+                                      } else if (snapshot.hasData) {
+                                        return Text("Error in loading comments");
+                                      } else {
+                                        return SizedBox(
+                                          height: 30,
+                                          width: 30,
+                                          child: CircularProgressIndicator(
+                                            valueColor:
+                                            AlwaysStoppedAnimation<Color>(SM_ORANGE),
+                                          ),
                                         );
-                                      });
-                                } else if (snapshot.hasData) {
-                                  return Text("Error in loading comments");
-                                } else {
-                                  return SizedBox(
-                                    height: 30,
-                                    width: 30,
-                                    child: CircularProgressIndicator(
-                                      valueColor:
-                                      AlwaysStoppedAnimation<Color>(SM_ORANGE),
-                                    ),
-                                  );
-                                }
-                              }),
-                          SizedBox(
-                            height: 50,
-                          ),
-                        ],
+                                      }
+                                    }),
+                                SizedBox(
+                                  height: 50,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
-                  ),
+                    )
+                  ],
                 ),
-              )
-            ],
-          ),
-        ),
-      ),
+              ),
+            );
+          }else {
+            return SizedBox(
+              height: 30,
+              width: 30,
+              child: CircularProgressIndicator(
+                valueColor:
+                AlwaysStoppedAnimation<Color>(
+                    SM_ORANGE),
+              ),
+            );
+          }
+    }
+      )
     );
   }
 }
