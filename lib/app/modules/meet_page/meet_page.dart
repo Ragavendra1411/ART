@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:js' as js;
-import 'dart:ui' as ui;
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
@@ -11,13 +10,13 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:share_market/app/modules/meet_page/enter_minutes_of_meeting.dart';
 import 'package:share_market/app/modules/meet_page/view_meet_details_card.dart';
-import 'package:share_market/app/modules/meet_page/view_more_text.dart';
-import 'package:share_market/app_commons/sm_text_field.dart';
 import 'package:share_market/app_commons/constants.dart';
+import 'package:share_market/app_commons/sm_text_field.dart';
 import 'package:share_market/services/meetings_services.dart';
 import 'package:universal_html/prefer_universal/html.dart' as html;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:validators/validators.dart';
+
 import '../../../app_commons/constants.dart';
 
 class MeetPage extends StatefulWidget {
@@ -822,11 +821,24 @@ class _MeetPageState extends State<MeetPage> {
                             "Minutes Of Meeting:",
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
-                          ExpandableText(
-                              data['minutesOfMeeting'].toString().trim(),
-                              data,
-                              width,
-                              dataSend["role"].toString()),
+                          SizedBox(height: 5,),
+                          data['minutesOfMeeting'] != null &&
+                                  data['minutesOfMeeting'] != ''
+                              ? InkWell(
+                            onTap: (){
+                              showMeetingDetailsPopUp(
+                                  context,
+                                  data,
+                                  width,
+                                  dataSend["role"].toString());
+                            },
+                                child: Text(
+                                    data['minutesOfMeeting'].toString().trim(),
+                                    maxLines: 3,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                              )
+                              : Container()
                         ],
                       )
                     : Container(),

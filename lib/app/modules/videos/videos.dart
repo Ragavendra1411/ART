@@ -38,7 +38,7 @@ class _VideosPageState extends State<VideosPage> {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: backgroundOrangeColour,
       appBar: AppBar(
         centerTitle: true,
         title: Text(folderData["name"]),

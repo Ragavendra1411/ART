@@ -303,11 +303,24 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                             SizedBox(
                               height: 10,
                             ),
-                            ExpandableTextForum(
+
+                            data['description'] != null &&
+                                data['description'] != ''
+                                ? InkWell(
+                              onTap: (){
+                                showMeetingDetailsPopUp(
+                                    context,
+                                    data,
+                                    width,
+                                    dataSend["role"].toString());
+                              },
+                              child: Text(
                                 data['description'].toString().trim(),
-                                data,
-                                width,
-                                dataSend["role"].toString()),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            )
+                                : Container()
                           ],
                         )
                       : Container(),
@@ -341,6 +354,62 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
               builder: (context) => ViewForum(data: data, dataSend: dataSend)),
         );
       },
+    );
+  }
+
+  // void _onTapLink() {
+  //   showMeetingDetailsPopUp(context,data,widget,widget.userRole.toString());
+  // }
+
+  showMeetingDetailsPopUp(BuildContext context,DocumentSnapshot data,double width,String userRole) async{
+    await showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context){
+          return _descDetail(width,data);
+        }
+    );
+  }
+
+  _descDetail(width,data){
+    return Center(
+      child: Card(
+        shadowColor: Colors.orange,
+        margin: EdgeInsets.all(10),
+        semanticContainer: true,
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        elevation: 5,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        child: Scrollbar(
+            child: SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.all(12),
+                width: width < 401 ? width : 400,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text('Description'),
+                        Expanded(child: Container()),
+                        IconButton(
+                            icon: Icon(Icons.cancel_outlined),
+                            onPressed: (){
+                              Navigator.pop(context);
+                            })
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    Text(data['description'])
+                  ],
+                ),
+              ),
+            )
+        ),
+      ),
     );
   }
 
@@ -469,9 +538,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
 
           void saveMeeting() async {
             if (titleController.text.trim().length == 0 ||
-                urlLinkController.text.trim().length == 0 ||
-                forumDescController.text.trim().length == 0 ||
-                dateController.text.trim().length == 0) {
+                urlLinkController.text.trim().length == 0 || dateController.text.trim().length == 0) {
               toastMessage("Enter all the fields.", ERROR_RED, Icons.error);
             } else if (!isURL(urlLinkController.text.trim(),
                 requireTld: false)) {
@@ -750,7 +817,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
                           context: context,
                           nextFocusNode: null,
                           currentFocusNode: null,
-                          title: "Forum Descriptions",
+                          title: "Forum Descriptions (Optional)",
                           controller: forumDescController,
                           formDataMapKey: null,
                           keyboardTypeDone: false,
