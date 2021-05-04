@@ -635,11 +635,14 @@ class _ViewForumState extends State<ViewForum> {
                                                           style: TextStyle(
                                                               fontWeight:
                                                                   FontWeight
-                                                                      .bold),
+                                                                      .bold,color: Colors.black),
                                                         ),
                                                         TextSpan(
                                                           text: repliesList[
                                                               index]["reply"],
+                                                          style: TextStyle(
+                                                            color: Colors.black
+                                                          )
                                                         ),
                                                       ],
                                                     ),
@@ -887,11 +890,29 @@ class _ViewForumState extends State<ViewForum> {
                                     SizedBox(
                                       height: 10,
                                     ),
-                                    ExpandableTextForum(
+                                    // ExpandableTextForum(
+                                    //     forumData['description'].toString().trim(),
+                                    //     forumData,
+                                    //     width,
+                                    //     dataSend["role"].toString()),
+
+                                    forumData['description'] != null &&
+                                        forumData['description'] != ''
+                                        ? InkWell(
+                                      onTap: (){
+                                        showMeetingDetailsPopUp(
+                                            context,
+                                            forumData,
+                                            width,
+                                            dataSend["role"].toString());
+                                      },
+                                      child: Text(
                                         forumData['description'].toString().trim(),
-                                        forumData,
-                                        width,
-                                        dataSend["role"].toString()),
+                                        maxLines: 3,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    )
+                                        : Container()
                                   ],
                                 )
                                     : Container(),
@@ -1068,12 +1089,15 @@ class _ViewForumState extends State<ViewForum> {
                                                                 text:
                                                                 "${questionsList[index]["userName"]}: ",
                                                                 style: TextStyle(
+                                                                  color: Colors.black,
                                                                     fontWeight:
                                                                     FontWeight.bold),
                                                               ),
                                                               TextSpan(
                                                                 text: questionsList[index]
-                                                                ["question"],
+                                                                ["question"],style: TextStyle(
+                                                                color: Colors.black
+                                                              )
                                                               ),
                                                             ],
                                                           ),
@@ -1152,6 +1176,58 @@ class _ViewForumState extends State<ViewForum> {
           }
     }
       )
+    );
+  }
+
+  showMeetingDetailsPopUp(BuildContext context,DocumentSnapshot data,double width,String userRole) async{
+    await showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context){
+          return _descDetail(width,data);
+        }
+    );
+  }
+
+  _descDetail(width,data){
+    return Center(
+      child: Card(
+        shadowColor: Colors.orange,
+        margin: EdgeInsets.all(10),
+        semanticContainer: true,
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        elevation: 5,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5.0),
+        ),
+        child: Scrollbar(
+            child: SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.all(12),
+                width: width < 401 ? width : 400,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text('Description'),
+                        Expanded(child: Container()),
+                        IconButton(
+                            icon: Icon(Icons.cancel_outlined),
+                            onPressed: (){
+                              Navigator.pop(context);
+                            })
+                      ],
+                    ),
+                    SizedBox(height: 20),
+                    Text(data['description'])
+                  ],
+                ),
+              ),
+            )
+        ),
+      ),
     );
   }
 }

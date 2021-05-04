@@ -137,14 +137,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                           setState(() {
                             _isLoading = false;
                           });
-                          print(value);
+
                           if (value["isSuccess"]) {
                             Utilities().toastMessage("Email sent successfully to reset your Password", cursorColour , Icons.done, width, context);
                             Future.delayed(Duration(seconds: 2),(){
                               Navigator.pop(context);
                             });
                           } else {
-                            print(value);
+
                             Utilities().toastMessage("Error in sending email", SM_RED, Icons.error, width, context);
                           }
                         }).catchError((error){

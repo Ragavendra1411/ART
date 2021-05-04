@@ -139,7 +139,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
   Widget build(BuildContext context) {
     width = MediaQuery.of(context).size.width;
     height = MediaQuery.of(context).size.height;
-    print('TIME ${DateTime.now().toLocal().toIso8601String()}');
+
     return Scaffold(
       floatingActionButton: dataSend['role'] == 'Admin'
           ? FloatingActionButton.extended(
@@ -184,7 +184,7 @@ class _ForumsMainPageState extends State<ForumsMainPage> {
             return Center(child: Text('Loading'));
           }
           if (snapshot.hasError) {
-            print("ERROR IS ${snapshot.error}");
+
             return Center(child: Text('Error'));
           }
           if (snapshot.connectionState == ConnectionState.done) {

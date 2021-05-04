@@ -262,7 +262,7 @@ class _SigninPageState extends State<SigninPage> {
                                     login_password.text.trim())
                                 .then((value) {
                               _setLoader(false);
-                              print("Auth then - ${value}");
+
                               if(value["isError"]){
                                 toastMessage(
                                     "${value["data"]}", SM_RED, Icons.error);

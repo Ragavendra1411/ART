@@ -146,7 +146,7 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
                                       });
                                       bool folderExists =
                                           await checkIfFolderAldreadyExists();
-                                      print("FOLDER EXISTS $folderExists");
+
                                       if (folderExists == true) {
                                         setState(() {
                                           isSavingFolder = false;
@@ -162,7 +162,7 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
                                               .millisecondsSinceEpoch,
                                           "isDeleted": false
                                         };
-                                        print("FOLDER $folderDetails");
+
 
                                         isEdit
                                             ? await DocumentServices()
@@ -171,8 +171,7 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
                                                         .trim(),
                                                     data.documentID)
                                                 .then((value) {
-                                                print(
-                                                    "VALUE.ISSUCCESS ${value["isSuccess"]}");
+
                                                 if (value["isSuccess"]) {
                                                   setState(() {
                                                     isSavingFolder = false;
@@ -192,7 +191,7 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
                                                       Icons.error);
                                                 }
                                               }).catchError((error) {
-                                                print("ERROR IS $error");
+
                                                 setState(() {
                                                   isSavingFolder = false;
                                                 });
@@ -207,8 +206,7 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
                                                         .trim(),
                                                     folderDetails)
                                                 .then((value) {
-                                                print(
-                                                    "VALUE.ISSUCCESS ${value["isSuccess"]}");
+
                                                 if (value["isSuccess"]) {
                                                   setState(() {
                                                     isSavingFolder = false;
@@ -228,7 +226,7 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
                                                       Icons.error);
                                                 }
                                               }).catchError((error) {
-                                                print("ERROR IS $error");
+
                                                 setState(() {
                                                   isSavingFolder = false;
                                                 });
@@ -327,8 +325,7 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
                                     await DocumentServices()
                                         .deleteFolder(data.documentID)
                                         .then((value) {
-                                      print(
-                                          "VALUE.ISSUCCESS ${value["isSuccess"]}");
+
                                       if (value["isSuccess"]) {
                                         setState(() {
                                           isSavingFolder = false;
@@ -348,7 +345,7 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
                                             Icons.error);
                                       }
                                     }).catchError((error) {
-                                      print("ERROR IS $error");
+
                                       setState(() {
                                         isSavingFolder = false;
                                       });
@@ -423,7 +420,7 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
     await DocumentServices()
         .checkIfFolderExists(folderTitleController.text.trim())
         .then((value) {
-      print("VALUE INSIDE FUNCTION $value");
+
       val = value;
     });
     return val;
@@ -443,7 +440,7 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
             return Center(child: Text('Loading'));
           }
           if (snapshot.hasError) {
-            print(snapshot.error);
+
             return Center(child: Text('Error'));
           }
           if (snapshot.connectionState == ConnectionState.done) {
@@ -481,12 +478,12 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
     return GestureDetector(
       onSecondaryTap:dataSend['role'] == 'Admin' ||
               dataSend['role'] == 'Professional'? () {
-        print("Right clcik");
+
         showRightPressDialog(context, data);
       }:null,
       onTap: width < 400
           ? () {
-              print("FOLDER OPENED");
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -500,7 +497,7 @@ class _DocumentFoldersPageState extends State<DocumentFoldersPage> {
       onDoubleTap: width < 400
           ? null
           : () {
-              print("FOLDER OPENED");
+
               Navigator.push(
                 context,
                 MaterialPageRoute(

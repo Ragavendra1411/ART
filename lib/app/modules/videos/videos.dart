@@ -330,8 +330,7 @@ class _VideosPageState extends State<VideosPage> {
                                                 .addVideo(folderData.documentID,
                                                     videoData)
                                                 .then((value) {
-                                              print(
-                                                  "VALUE.ISSUCCESS ${value["isSuccess"]}");
+
                                               if (value["isSuccess"]) {
                                                 setState(() {
                                                   isSavingVideo = false;
@@ -444,7 +443,7 @@ class _VideosPageState extends State<VideosPage> {
       onSecondaryTap:
           dataSend['role'] == 'Admin' || dataSend['role'] == 'Professional'
               ? () {
-                  print("Right clcik");
+
                   showRightPressDialog(context, data);
                 }
               : null,
@@ -578,8 +577,7 @@ class _VideosPageState extends State<VideosPage> {
                                     await VideoServices()
                                         .deleteVideo(data.documentID,folderData.documentID)
                                         .then((value) {
-                                      print(
-                                          "VALUE.ISSUCCESS ${value["isSuccess"]}");
+
                                       if (value["isSuccess"]) {
                                         setState(() {
                                           isSavingFolder = false;
@@ -748,7 +746,7 @@ class _VideosPageState extends State<VideosPage> {
                                       });
                                       bool folderExists =
                                           await checkIfVideoExists();
-                                      print("FOLDER EXISTS $folderExists");
+
                                       if (folderExists == true) {
                                         setState(() {
                                           isSavingFolder = false;
@@ -761,8 +759,7 @@ class _VideosPageState extends State<VideosPage> {
                                                 titleController.text.trim(),
                                                 data.documentID)
                                             .then((value) {
-                                          print(
-                                              "VALUE.ISSUCCESS ${value["isSuccess"]}");
+
                                           if (value["isSuccess"]) {
                                             setState(() {
                                               isSavingFolder = false;
@@ -829,7 +826,7 @@ class _VideosPageState extends State<VideosPage> {
     await VideoServices()
         .checkIfVideoExists(titleController.text.trim())
         .then((value) {
-      print("VALUE INSIDE FUNCTION $value");
+
       val = value;
     });
     return val;

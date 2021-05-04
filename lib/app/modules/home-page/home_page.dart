@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage>
   @override
   void initState() {
     // TODO: implement initState
-    print("Coming to home");
+
     super.initState();
     // print(user.email);
     if (userDatas == null) {

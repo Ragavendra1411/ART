@@ -17,7 +17,7 @@ class DocumentServices {
         val = false;
       }
     });
-    print("VALUE INSIDE SERVICE $val");
+
 
     return val;
   }
@@ -34,7 +34,7 @@ class DocumentServices {
         val = false;
       }
     });
-    print("VALUE INSIDE SERVICE $val");
+
 
     return val;
   }

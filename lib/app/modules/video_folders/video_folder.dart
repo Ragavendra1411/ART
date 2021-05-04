@@ -146,7 +146,7 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
                                       });
                                       bool folderExists =
                                           await checkIfFolderAldreadyExists();
-                                      print("FOLDER EXISTS $folderExists");
+
                                       if (folderExists == true) {
                                         setState(() {
                                           isSavingFolder = false;
@@ -162,7 +162,7 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
                                               .millisecondsSinceEpoch,
                                           "isDeleted": false
                                         };
-                                        print("FOLDER $folderDetails");
+
 
                                         isEdit
                                             ? await VideoServices()
@@ -171,8 +171,7 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
                                                         .trim(),
                                                     data.documentID)
                                                 .then((value) {
-                                                print(
-                                                    "VALUE.ISSUCCESS ${value["isSuccess"]}");
+
                                                 if (value["isSuccess"]) {
                                                   setState(() {
                                                     isSavingFolder = false;
@@ -207,8 +206,7 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
                                                         .trim(),
                                                     folderDetails)
                                                 .then((value) {
-                                                print(
-                                                    "VALUE.ISSUCCESS ${value["isSuccess"]}");
+
                                                 if (value["isSuccess"]) {
                                                   setState(() {
                                                     isSavingFolder = false;
@@ -327,8 +325,7 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
                                     await VideoServices()
                                         .deleteFolder(data.documentID)
                                         .then((value) {
-                                      print(
-                                          "VALUE.ISSUCCESS ${value["isSuccess"]}");
+
                                       if (value["isSuccess"]) {
                                         setState(() {
                                           isSavingFolder = false;
@@ -423,7 +420,7 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
     await VideoServices()
         .checkIfFolderExists(folderTitleController.text.trim())
         .then((value) {
-      print("VALUE INSIDE FUNCTION $value");
+
       val = value;
     });
     return val;
@@ -482,13 +479,13 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
       onSecondaryTap:
           dataSend['role'] == 'Admin' || dataSend['role'] == 'Professional'
               ? () {
-                  print("Right clcik");
+
                   showRightPressDialog(context, data);
                 }
               : null,
       onTap: width < 400
           ? () {
-              print("FOLDER OPENED");
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -502,7 +499,7 @@ class _VideoFoldersPageState extends State<VideoFoldersPage> {
       onDoubleTap: width < 400
           ? null
           : () {
-              print("FOLDER OPENED");
+
               Navigator.push(
                 context,
                 MaterialPageRoute(

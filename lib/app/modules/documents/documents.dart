@@ -332,8 +332,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                                                     folderData.documentID,
                                                     videoData)
                                                 .then((value) {
-                                              print(
-                                                  "VALUE.ISSUCCESS ${value["isSuccess"]}");
+
                                               if (value["isSuccess"]) {
                                                 setState(() {
                                                   isSavingVideo = false;
@@ -446,7 +445,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
       onSecondaryTap:
           dataSend['role'] == 'Admin' || dataSend['role'] == 'Professional'
               ? () {
-                  print("Right clcik");
+
                   showRightPressDialog(context, data);
                 }
               : null,
@@ -584,8 +583,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                                     await DocumentServices()
                                         .deleteDocument(data.documentID,folderData.documentID)
                                         .then((value) {
-                                      print(
-                                          "VALUE.ISSUCCESS ${value["isSuccess"]}");
+
                                       if (value["isSuccess"]) {
                                         setState(() {
                                           isSavingFolder = false;
@@ -680,7 +678,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
     await DocumentServices()
         .checkIfDocumentExists(titleController.text.trim())
         .then((value) {
-      print("VALUE INSIDE FUNCTION $value");
+
       val = value;
     });
     return val;
@@ -766,7 +764,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                                       });
                                       bool folderExists =
                                           await checkIfDocumentExists();
-                                      print("FOLDER EXISTS $folderExists");
+
                                       if (folderExists == true) {
                                         setState(() {
                                           isSavingFolder = false;
@@ -779,8 +777,7 @@ class _DocumentsPageState extends State<DocumentsPage> {
                                                 titleController.text.trim(),
                                                 data.documentID)
                                             .then((value) {
-                                          print(
-                                              "VALUE.ISSUCCESS ${value["isSuccess"]}");
+
                                           if (value["isSuccess"]) {
                                             setState(() {
                                               isSavingFolder = false;

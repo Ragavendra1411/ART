@@ -61,7 +61,7 @@ class SignInProvider extends ChangeNotifier {
             var dataSend = {
               'email': value.documents[0]['email'],
             };
-            print(dataSend);
+
             resultData = {"notError": "success", 'data': dataSend};
           }else{
             resultData = {"notError": "Account not found"};

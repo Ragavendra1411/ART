@@ -1,6 +1,6 @@
 # share_market
 
-A new Flutter project.
+Sharemarket profile.
 
 ## Getting Started
 

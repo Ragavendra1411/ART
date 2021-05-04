@@ -16,7 +16,7 @@ class VideoServices {
         val = false;
       }
     });
-    print("VALUE INSIDE SERVICE $val");
+
 
     return val;
   }
@@ -33,7 +33,7 @@ class VideoServices {
         val = false;
       }
     });
-    print("VALUE INSIDE SERVICE $val");
+
 
     return val;
   }
